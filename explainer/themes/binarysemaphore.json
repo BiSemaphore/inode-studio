@@ -1,0 +1,18 @@
+{
+ "name": "binarysemaphore",
+ "about": "Binary Semaphore site palette: white-smoke canvas, near-black ink, deep red accent (binarysemaphore.com globals.css).",
+ "colors": {
+  "paper": "#f6f6f4", "dots": "#e6e6e6", "ink": "#111111",
+  "accent": "#2e6ff2", "red": "#a80000", "green": "#2f9e44", "highlight": "#ffc23c", "bars": "#2e6ff2",
+  "term-bg": "#111111", "term-fg": "#f5f5f5", "term-shadow": "#111111",
+  "sub-bg": "#111111", "sub-fg": "#ffffff",
+  "card-bg": "#ffffff", "brand-ink": "#111111", "brand-dot": "#a80000", "link": "#a80000",
+  "server": "#2e6ff2", "server-fill": "#a9c3fa",
+  "file": "#d99a00", "file-fill": "#ffd66b",
+  "bucket": "#5f9a12", "bucket-fill": "#c9ec8a",
+  "db": "#8b5cf6", "db-fill": "#d2c2fc",
+  "lb": "#111111", "lb-fill": "#d9d9d9"
+ },
+ "concepts": "One colour per concept, the same in every episode: server blue, file sun, bucket lime, database violet, load balancer grey. Red is failure, green is success.",
+ "fonts": { "hand": "Virgil", "mono": "Ubuntu Mono", "title": "Overused Grotesk" }
+}

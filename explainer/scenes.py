@@ -113,6 +113,9 @@ class Board(_Scene):
         elif kind == "cross":
             r = k.get("r", 40)
             self._grow(k["x"] - r, k["y"] - r, k["x"] + r, k["y"] + r)
+        elif kind == "cylinder":
+            ry = k["h"] * 0.12
+            self._grow(k["x"], k["y"] - ry, k["x"] + k["w"], k["y"] + k["h"] + ry)
 
     def done(self):
         self._cam()
