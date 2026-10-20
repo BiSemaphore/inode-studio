@@ -1,0 +1,96 @@
+/* Explainer house style. Colours and fonts come from the theme (explainer/themes/*.json),
+   which build.py writes into :root as CSS variables; this file holds only layout. */
+@font-face { font-family: "Virgil"; src: url("../fonts/Virgil.woff2") format("woff2"); }
+@font-face { font-family: "Ubuntu Mono"; src: url("../fonts/UbuntuMono-Regular.ttf") format("truetype"); }
+@font-face { font-family: "Ubuntu Mono"; src: url("../fonts/UbuntuMono-Bold.ttf") format("truetype"); font-weight: 700; }
+@font-face { font-family: "Overused Grotesk"; src: url("../fonts/OverusedGrotesk-SemiBold.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Overused Grotesk"; src: url("../fonts/OverusedGrotesk-Bold.woff2") format("woff2"); font-weight: 700; }
+
+html, body { margin: 0; background: var(--paper); }
+#stage { position: relative; overflow: hidden;   /* size set inline from the format */
+  background: var(--paper) radial-gradient(var(--dots) 1.3px, transparent 1.5px) 0 0 / 34px 34px; }
+#world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#board, #inklayer { position: absolute; left: 0; top: 0; overflow: visible; }
+#inklayer { z-index: 4; pointer-events: none; }
+
+/* Terminal cards: Ubuntu Mono, white on black, nothing grey. Lines wrap
+   (a narrow terminal reads better on a phone than a wide one zoomed out). */
+.term { position: absolute; z-index: 2; background: var(--term-bg); border-radius: 16px; border: 3px solid var(--term-bg);
+  box-shadow: 10px 12px 0 var(--term-shadow); overflow: hidden; }
+.term .bar { height: 46px; background: var(--term-bg); display: flex; gap: 12px; align-items: center; padding: 0 20px; border-bottom: 1px solid #fff2; }
+.term .bar i { width: 15px; height: 15px; border-radius: 50%; background: #ff5f57; }
+.term .bar i:nth-child(2) { background: #febc2e; }
+.term .bar i:nth-child(3) { background: #28c840; }
+.term .body { padding: 26px 36px; font: 32px/46px var(--font-mono), monospace; color: var(--term-fg); }
+.term .ln { white-space: pre-wrap; overflow-wrap: anywhere; visibility: hidden; color: var(--term-fg);
+  text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 4px; text-underline-offset: 7px; }
+
+.dotw { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 3; }
+.dot { position: absolute; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%;
+  border: 3px solid var(--ink); box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+.dot span { font: 26px var(--font-hand); color: #fff; margin-top: 2px; }
+.dlabel { position: absolute; left: 22px; top: -14px; white-space: nowrap; font: 26px var(--font-hand); color: var(--ink); }
+.dlabel.left { left: auto; right: 30px; }
+
+/* Subtitles: one line at a time in Ubuntu Mono, pure white on solid black;
+   words appear as they are spoken, no fades. */
+#subtitles { position: absolute; left: 0; right: 0; bottom: 56px; z-index: 10; }
+.sub { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); white-space: nowrap; }
+.sub .w { visibility: hidden; font: 30px/1.5 var(--font-mono), monospace; color: var(--sub-fg); background: var(--sub-bg);
+  white-space: pre; padding: 6px 12px 6px 0; margin-right: -12px; border-radius: 0 8px 8px 0;
+  box-shadow: -1px 0 0 var(--sub-bg); }
+/* Every word ends in a rounded cap; the next word is painted over it, so the
+   line always ends rounded, even while it is still being spoken. */
+.sub .w.first { padding-left: 16px; border-radius: 8px; }
+.sub .w.last { padding-right: 16px; }
+
+/* Logo lockup from brand.json (mark next to the wordmark, or either alone).
+   Watermark top right, quiet; again on the intro and end cards. Centred by
+   default; logo.word_offset in brand.json drops the wordmark onto the mark's
+   baseline instead (set inline by build.py). */
+.lockup { display: flex; align-items: center; gap: 0.3em; }
+.logo-mark { height: 1.6em; }
+.logo-word { height: 1em; }
+#watermark { position: absolute; top: 34px; right: 44px; font-size: 28px; opacity: .7; z-index: 11; }
+
+#endcard { position: absolute; inset: 0; background: var(--paper); opacity: 0; z-index: 20; display: flex;
+  flex-direction: column; align-items: center; justify-content: center; gap: 22px; }
+#endcard .mark { font: 700 190px/1 var(--font-title), sans-serif; letter-spacing: -6px; color: var(--ink); }
+#endcard .sub2 { font: 600 46px var(--font-title), sans-serif; color: var(--ink); }
+#endcard .url { font: 44px var(--font-mono), monospace; color: var(--link); margin-top: 18px; }
+#endcard .by { position: absolute; bottom: 64px; font-size: 44px; gap: 16px; }
+
+/* Opening card (frame 0): the hook as typography, series label, lockup. */
+#introcard { position: absolute; inset: 0; z-index: 21; background: var(--card-bg); }
+#introcard .label { position: absolute; left: 150px; top: 130px; font: 30px var(--font-mono), monospace; color: var(--brand-ink); }
+#introcard h1 { position: absolute; left: 150px; top: 250px; margin: 0; font: 700 210px/0.9 var(--font-title), sans-serif;
+  letter-spacing: -0.045em; color: var(--brand-ink); }
+#introcard .brand-dot { display: inline-block; width: 0.17em; height: 0.17em; border-radius: 50%; background: var(--brand-dot); margin-left: 0.04em; vertical-align: baseline; line-height: 0; }
+#introcard .lockup { position: absolute; left: 155px; bottom: 120px; font-size: 40px; }
+
+/* Stamps (kit.js `stamp`). */
+.stamp { position: absolute; z-index: 6; padding: 6px 26px 10px; border: 6px solid; border-radius: 14px;
+  font: 700 64px/1 var(--font-title), sans-serif; letter-spacing: 0.06em; background: color-mix(in srgb, var(--paper) 85%, transparent);
+  white-space: nowrap; opacity: 0; }
+
+/* Vertical (1080x1920): captions larger and above the apps' bottom controls. */
+body.vertical #subtitles { bottom: 400px; }
+body.vertical .sub .w { font-size: 46px; }
+body.vertical #watermark { top: 120px; right: 60px; font-size: 32px; }
+body.vertical #endcard .mark { font-size: 220px; }
+body.vertical #endcard .sub2 { font-size: 50px; text-align: center; padding: 0 90px; line-height: 1.25; }
+body.vertical #endcard .url { font-size: 40px; }
+body.vertical #endcard .by { bottom: 300px; }
+
+/* Clean cards (kit.js `card`), theme "clean". */
+.card { position: absolute; box-sizing: border-box; padding: 26px 32px 30px; background: var(--card-bg); border: 3px solid var(--card-line, #dde3ea);
+  border-radius: 26px; box-shadow: 0 18px 40px rgba(10, 30, 60, .10); color: var(--ink); opacity: 0; }
+.card .label { font: 700 26px/1.2 var(--font-mono), monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--brand-ink); margin-bottom: 10px; }
+.card .title { font: 700 52px/1.1 var(--font-title), sans-serif; letter-spacing: -0.02em; }
+.card .body { font: 36px/1.3 var(--font-mono), monospace; margin-top: 12px; overflow-wrap: anywhere; }
+.card.tone-good { background: var(--good-bg, #e9f9ef); border-color: var(--green); }
+.card.tone-good .label { color: var(--green); }
+.card.tone-bad { background: var(--bad-bg, #fdecec); border-color: var(--red); }
+.card.tone-bad .label, .card.tone-bad .body { color: var(--red); }
+.card.tone-accent { background: var(--accent-bg, #eaf3ff); border-color: var(--accent); }
+.card.tone-accent .label { color: var(--accent); }

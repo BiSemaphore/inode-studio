@@ -1,0 +1,13 @@
+{
+ "name": "blackboard",
+ "dark": true,
+ "about": "Dark slate with chalk-white ink; same fonts and layout. For late-night or contrast-heavy topics.",
+ "colors": {
+  "paper": "#16181d", "dots": "#262a31", "ink": "#f1f3f5",
+  "accent": "#4dabf7", "red": "#ff6b6b", "green": "#69db7c", "highlight": "#fab005", "bars": "#74c0fc",
+  "term-bg": "#000000", "term-fg": "#ffffff", "term-shadow": "#000000",
+  "sub-bg": "#000000", "sub-fg": "#ffffff",
+  "card-bg": "#16181d", "brand-ink": "#ffffff", "brand-dot": "#00a6fb", "link": "#4dabf7"
+ },
+ "fonts": { "hand": "Virgil", "mono": "Ubuntu Mono", "title": "Overused Grotesk" }
+}

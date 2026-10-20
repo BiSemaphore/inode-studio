@@ -1,0 +1,12 @@
+{
+ "name": "whiteboard",
+ "about": "Warm paper with a dot grid, hand-drawn ink, black terminals and subtitles. The house style of ep01 and ep02.",
+ "colors": {
+  "paper": "#fdfcf8", "dots": "#ebe8de", "ink": "#1e1e1e",
+  "accent": "#1c7ed6", "red": "#e03131", "green": "#2f9e44", "highlight": "#ffd43b", "bars": "#4dabf7",
+  "term-bg": "#000000", "term-fg": "#ffffff", "term-shadow": "#1e1e1e",
+  "sub-bg": "#000000", "sub-fg": "#ffffff",
+  "card-bg": "#ffffff", "brand-ink": "#003554", "brand-dot": "#00a6fb", "link": "#1c7ed6"
+ },
+ "fonts": { "hand": "Virgil", "mono": "Ubuntu Mono", "title": "Overused Grotesk" }
+}

@@ -1,0 +1,25 @@
+node_modules/
+.venv/
+__pycache__/
+.DS_Store
+
+# Voice model (scripts/setup.sh downloads it)
+tts/*.onnx
+tts/*.bin
+
+# Your brand and your videos stay yours
+brand.json
+brand/
+videos/
+motion/*
+!motion/examples/
+
+# Generated per piece
+motion/**/out/
+motion/**/voice/
+motion/**/piece.html
+motion/**/audio.wav
+motion/**/sfx.json
+motion/**/beats.json
+motion/**/meta.json
+motion/**/*.srt

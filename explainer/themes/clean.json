@@ -1,0 +1,13 @@
+{
+ "name": "clean",
+ "about": "Motion-design look: plain light canvas, UI cards with soft shadows, smooth connectors, grotesk type. No hand-drawn strokes. For reels.",
+ "colors": {
+  "paper": "#f5f7fa", "dots": "#f5f7fa", "ink": "#0f1720",
+  "accent": "#0a84ff", "red": "#e5383b", "green": "#1f9d55", "highlight": "#ffd43b", "bars": "#4dabf7",
+  "term-bg": "#0b0f14", "term-fg": "#ffffff", "term-shadow": "#00000033",
+  "sub-bg": "#000000", "sub-fg": "#ffffff",
+  "card-bg": "#ffffff", "card-line": "#dde3ea", "brand-ink": "#003554", "brand-dot": "#00a6fb", "link": "#0a84ff",
+  "good-bg": "#e9f9ef", "bad-bg": "#fdecec", "accent-bg": "#eaf3ff"
+ },
+ "fonts": { "hand": "Overused Grotesk", "mono": "Ubuntu Mono", "title": "Overused Grotesk" }
+}

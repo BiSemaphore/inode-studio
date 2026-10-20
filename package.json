@@ -1,0 +1,20 @@
+{
+  "name": "inode-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Narrated explainer videos rendered from HTML, frame by frame, on your own machine.",
+  "license": "MIT",
+  "scripts": {
+    "setup": "scripts/setup.sh",
+    "new": "explainer/new.sh $npm_config_piece",
+    "preview": "scripts/preview.sh $npm_config_piece",
+    "check": "explainer/check.sh motion/$npm_config_piece",
+    "motion": "node tools/record.js motion/$npm_config_piece/piece.html motion/$npm_config_piece/out",
+    "video": "scripts/video.sh $npm_config_piece",
+    "progress": "scripts/progress.sh",
+    "publish": ".venv/bin/python tools/publish.py motion/$npm_config_piece"
+  },
+  "devDependencies": {
+    "puppeteer-core": "23.11.1"
+  }
+}

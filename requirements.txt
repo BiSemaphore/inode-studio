@@ -1,0 +1,9 @@
+# One environment for everything (scripts/setup.sh). Python 3.12: torch wheels
+# lag behind new Python releases.
+numpy==2.5.4
+pillow==13.0.0
+soundfile==0.14.0
+kokoro-onnx==0.6.1
+onnxruntime==1.31.0
+torch==2.14.1
+torchaudio==2.11.0
