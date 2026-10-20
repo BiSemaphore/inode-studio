@@ -57,6 +57,9 @@ def main(piece):
     for t, kind in e["keys"]:
         # Quiet: clicks about 28 dB under the voice (measured from the stems).
         sound.place(sfx, sound.key_sound(kind), t, 0.055 if kind == "enter" else 0.045, rng.uniform(-0.1, 0.1))
+    for t in e.get("clicks", []):
+        # Mouse clicks for screen-recorded pieces; a touch above the keys so a UI click reads.
+        sound.place(sfx, sound.mouse_sound(), t - 0.01, 0.07, rng.uniform(-0.1, 0.1))
     for t in e["ticks"]:
         sound.place(sfx, sound.beeps([(1568, 0.02)]), t, 0.012)
     for t in e["pops"]:
