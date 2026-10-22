@@ -107,6 +107,13 @@ class Board(_Scene):
             self._grow(k["x"], k["y"], k["x"] + k["w"], k["y"] + k.get("h", 160))
         elif kind == "flow":
             self._grow(min(k["from"][0], k["to"][0]), min(k["from"][1], k["to"][1]), max(k["from"][0], k["to"][0]), max(k["from"][1], k["to"][1]))
+        elif kind == "node":
+            self._grow(k["x"], k["y"], k["x"] + k["w"], k["y"] + k["h"])
+        elif kind == "packet":
+            self._grow(min(k["from"][0], k["to"][0]), min(k["from"][1], k["to"][1]), max(k["from"][0], k["to"][0]), max(k["from"][1], k["to"][1]))
+        elif kind == "code":
+            rows = len(k["src"]) + len(k.get("notes", []))
+            self._grow(k["x"], k["y"], k["x"] + k["w"], k["y"] + 58 + 40 + rows * 46)
         elif kind == "lock":
             z = k.get("size", 120)
             self._grow(k["x"] - z / 2, k["y"] - z / 2, k["x"] + z / 2, k["y"] + z * 0.6)
@@ -171,3 +178,21 @@ class Statement(_Scene):
                 s.op("marker", highlight[1], x=cx - w / 2 + self.ox, y=y - size * 0.3 + self.oy, w=w, h=size * 0.45)
             y += size * 0.3
         self.s.cam(at, self.ox, self.oy, s.width, s.height)
+
+
+class BeforeAfter(Board):
+    """Before and after: two cards, stacked on vertical, side by side on landscape.
+    before / after: {"at", "title", "body", "h"}; each card lands at its own time."""
+
+    def __init__(self, s, at, before, after, title=None):
+        super().__init__(s, at, title)
+        vertical = s.format == "vertical"
+        w = 920 if vertical else 800
+        hb = before.get("h", 280)
+        pos = [(80, 260), (80, 260 + hb + 110)] if vertical else [(80, 300), (1040, 300)]
+        for (x, y), (label, tone, c) in zip(pos, [("before", "bad", before), ("after", "good", after)]):
+            self.op("card", c["at"], x=x, y=y, w=w, h=c.get("h", 280), label=label, title=c["title"], body=c.get("body", ""), tone=tone)
+        if vertical:
+            self.op("flow", after["at"] - 0.3, **{"from": [540, 260 + hb + 12], "to": [540, 260 + hb + 96]}, color="ink", width=5)
+        else:
+            self.op("flow", after["at"] - 0.3, **{"from": [900, 440], "to": [1020, 440]}, color="ink", width=5)

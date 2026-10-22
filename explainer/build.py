@@ -158,6 +158,14 @@ class Story:
             self.sfx["pops"].append(at + (o.get("fly", 1.1) if "from" in o else 0))
         if kind == "block":
             self.sfx["pops"].append(at)
+        if kind == "node":
+            self.sfx["pops"].append(at)
+            for ev in o.get("events", []):
+                self.sfx["misses" if ev["kind"] == "fail" else "hits" if ev["kind"] == "ok" else "ticks"].append(ev["at"])
+        if kind == "packet":
+            self.sfx["ticks"].append(at + o.get("dur", 0.8))        # arrival
+        if kind == "code":
+            self.sfx["ticks"].append(at)
             for ln in o.get("lines", []):
                 if ln.get("times"):
                     self.sfx["keys"] += self._keys(ln["times"], ln["text"], start=ln.get("prompt", 0))

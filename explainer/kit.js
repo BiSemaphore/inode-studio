@@ -27,6 +27,11 @@
   const defs = document.getElementById('defs');
   const rc = rough.svg(svg);
   let uid = 0;
+  // Motion language, shared by every component: one entrance per kind of thing,
+  // short arcs (250-500 ms), nothing decorative. A theme may override via MOTION.motion.
+  const T = Object.assign({ enter: 0.35, node: 0.4, packet: 0.8, pulse: 0.7, shake: 0.45, tone: 0.3, line: 0.12, note: 0.3 },
+    window.MOTION.motion || {});
+  const EASE_IN = 'cubic-bezier(.2,.9,.3,1)';
 
   function anim(el, frames, at, dur, easing = 'ease-in-out', fill = 'both') {
     return el.animate(frames, { delay: ms(at), duration: ms(Math.max(dur, 0.001)), fill, easing });
@@ -421,6 +426,115 @@
     anim(head, [{ opacity: 0 }, { opacity: 1 }], o.at + dur * 0.85, 0.08, 'linear');
   }
 
+  // ---------- components: architecture nodes, travelling packets, code ----------
+
+  // A system node (client, API, DNS, database...): scales in, then reacts on cue.
+  // events: [{at, kind: 'pulse' | 'fail' | 'ok'}]. fail shakes once and stays red,
+  // ok turns green, pulse rings once (the node is doing work).
+  function node(o) {
+    const el = document.createElement('div');
+    el.className = 'node' + (o.tone ? ' tone-' + o.tone : '');
+    Object.assign(el.style, { left: o.x + 'px', top: o.y + 'px', width: o.w + 'px', height: o.h + 'px' });
+    el.innerHTML = (o.icon ? `<div class="icon">${o.icon}</div>` : '') + `<div class="t">${o.title || ''}</div>` +
+      (o.sub ? `<div class="s">${o.sub}</div>` : '');
+    world.appendChild(el);
+    anim(el, [{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'none' }], o.at, T.node, EASE_IN);
+    for (const ev of o.events || []) {
+      if (ev.kind === 'pulse') {
+        anim(el, [{ boxShadow: `0 0 0 0 ${col(ev.color || 'accent')}` }, { boxShadow: '0 0 0 22px transparent' }], ev.at, T.pulse, 'ease-out', 'none');
+      } else if (ev.kind === 'fail') {
+        anim(el, [{ transform: 'none' }, { transform: 'translateX(-14px)' }, { transform: 'translateX(12px)' }, { transform: 'translateX(-8px)' },
+          { transform: 'translateX(4px)' }, { transform: 'none' }], ev.at, T.shake, 'ease-in-out', 'none');
+        anim(el, [{}, { borderColor: col('red'), background: 'var(--bad-bg, #fdecec)' }], ev.at, T.tone, 'ease-out', 'forwards');
+      } else if (ev.kind === 'ok') {
+        anim(el, [{}, { borderColor: col('green'), background: 'var(--good-bg, #e9f9ef)' }], ev.at, T.tone, 'ease-out', 'forwards');
+        anim(el, [{ transform: 'none' }, { transform: 'scale(1.04)' }, { transform: 'none' }], ev.at, T.tone + 0.1, 'ease-out', 'none');
+      }
+    }
+  }
+
+  // A message travelling from `from` to `to` (optionally curved by `bend`): a dot,
+  // or a pill when it has a `label`. It fades in, travels, and fades out on arrival
+  // unless `stay` keeps it at the destination.
+  function packet(o) {
+    const wrap = document.createElement('div');
+    wrap.className = 'packetw';
+    const p = document.createElement('div');
+    p.className = 'packet' + (o.label ? '' : ' dotonly');
+    p.style.background = o.color || col('accent');
+    if (o.label) p.textContent = o.label;
+    wrap.appendChild(p);
+    world.appendChild(wrap);
+    const [fx, fy] = o.from, [x, y] = o.to;
+    const bend = o.bend || 0, a = Math.atan2(y - fy, x - fx);
+    const cx = (fx + x) / 2 + bend * Math.sin(a), cy = (fy + y) / 2 - bend * Math.cos(a);
+    wrap.style.offsetPath = `path("M ${fx} ${fy} Q ${cx} ${cy} ${x} ${y}")`;
+    wrap.style.offsetRotate = '0deg';
+    const dur = o.dur || T.packet;
+    const kf = o.stay
+      ? [{ offsetDistance: '0%', opacity: 0 }, { opacity: 1, offset: 0.12 }, { offsetDistance: '100%', opacity: 1 }]
+      : [{ offsetDistance: '0%', opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.86 }, { offsetDistance: '100%', opacity: 0 }];
+    // fill both: hidden before it departs, and (unless it stays) hidden after it arrives.
+    anim(wrap, kf, o.at, dur, 'cubic-bezier(.45,0,.25,1)', 'both');
+  }
+
+  // Code card: a file tab, line numbers, simple syntax colours. Lines appear one
+  // after another (or at `lineAt`), `marks` tint ranges (add / del / focus),
+  // `spotlight` dims every other line, `notes` add a short line under a line.
+  const KW = /^(func|return|if|else|for|range|const|let|var|def|class|import|from|package|type|struct|nil|true|false|None|True|False|async|await|try|catch|except|raise|throw|new|err|go|defer|while|in|not|and|or)$/;
+  function highlight(src, lang) {
+    const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const hash = /^(py|python|sh|bash|yaml|toml|rb)$/.test(lang || '');
+    const re = hash ? /(#.*$)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g
+      : /(\/\/.*$)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g;
+    let out = '', last = 0, m;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      const t = esc(m[0]);
+      out += m[1] ? `<span class="tk-com">${t}</span>` : m[2] ? `<span class="tk-str">${t}</span>` : m[3] ? `<span class="tk-num">${t}</span>`
+        : KW.test(m[4]) ? `<span class="tk-kw">${t}</span>` : t;
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  function code(o) {
+    const el = document.createElement('div');
+    el.className = 'code';
+    Object.assign(el.style, { left: o.x + 'px', top: o.y + 'px', width: o.w + 'px' });
+    el.innerHTML = `<div class="tab"><i></i><i></i><i></i><span class="file">${o.file || ''}</span>` +
+      (o.lang ? `<span class="lang">${o.lang}</span>` : '') + '</div><div class="cbody"></div>';
+    world.appendChild(el);
+    anim(el, [{ opacity: 0, transform: 'translateY(24px)' }, { opacity: 1, transform: 'none' }], o.at, T.enter, EASE_IN);
+    const body = el.querySelector('.cbody'), first = o.start || 1, rows = [];
+    o.src.forEach((src, k) => {
+      const ln = document.createElement('div');
+      ln.className = 'cl';
+      ln.innerHTML = `<span class="gut">${first + k}</span><span class="src">${highlight(src, o.lang) || ' '}</span>`;
+      body.appendChild(ln);
+      rows.push(ln);
+      const t = (o.lineAt && o.lineAt[k] !== undefined) ? o.lineAt[k] : o.at + T.enter + k * T.line;
+      anim(ln, [{ opacity: 0, transform: 'translateX(-10px)' }, { opacity: 1, transform: 'none' }], t, 0.18, 'ease-out');
+      for (const n of (o.notes || []).filter((n) => n.line === first + k)) {
+        const d = document.createElement('div');
+        d.className = 'cnote' + (n.tone ? ' ' + n.tone : '');
+        d.textContent = '↳ ' + n.text;
+        body.appendChild(d);
+        anim(d, [{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], n.at, T.note, 'ease-out');
+      }
+    });
+    const TINT = { add: 'rgba(46,160,67,.30)', del: 'rgba(248,81,73,.30)', focus: 'rgba(255,203,107,.20)' };
+    for (const m of o.marks || []) {
+      rows.slice(m.from - first, m.to - first + 1).forEach((r) =>
+        anim(r, [{ background: 'transparent' }, { background: TINT[m.tone || 'focus'] }], m.at, T.tone, 'ease-out', 'forwards'));
+    }
+    if (o.spotlight) {
+      const { at, from, to } = o.spotlight;
+      rows.forEach((r, k) => {
+        if (k + first < from || k + first > to) anim(r.querySelector('.src'), [{ opacity: 1 }, { opacity: 0.3 }], at, T.tone, 'ease-out', 'forwards');
+      });
+    }
+  }
+
   // A padlock whose shackle snaps shut at `at`.
   function lock(o) {
     const s = o.size || 120, color = o.color || col('green');
@@ -448,7 +562,7 @@
       trace(body, end, dur * 0.65, o);
     },
     polygon: (o, i) => { const g = rc.polygon(o.pts, roughOpts(o, i)); ink.appendChild(g); trace(g, o.at, o.dur || 0.8, o); },
-    write, marker, ring, ellipse, block, dot, bars, arrow, stamp, card, flow, lock,
+    write, marker, ring, ellipse, block, dot, bars, arrow, stamp, card, flow, lock, node, packet, code,
     cross: (o, i) => {
       const { x, y } = o, r = o.r || 40;
       const c = { ...o, color: o.color || col('red'), width: 6, roughness: 0.6, layer: 'ink' };
