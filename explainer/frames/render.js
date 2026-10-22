@@ -22,11 +22,14 @@ const FPS = 30;   // Reels play at 30; a 60 fps upload gets half its frames thro
   await page.goto('file://' + path.join(dir, 'page.html'), { waitUntil: 'networkidle0' });
   await page.evaluate(() => document.fonts.ready);
   await page.evaluate(() => window.MEASURE && window.MEASURE());   // circles need the real font metrics
+  // wait until Chrome has painted the new frame: big zoomed canvases otherwise mix old and new tiles
+  const settle = () => page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => requestAnimationFrame(r), 40)))));
   const { total, end, cues } = await page.evaluate(() => ({ total: window.TOTAL, end: window.END, cues: window.CUES }));
 
   if (stills.length) {
     for (const t of stills) {
       await page.evaluate((x) => window.renderFrame(x), t);
+      await settle();
       await page.screenshot({ path: path.join(dir, 'out', `still-${t}.png`) });
     }
     await browser.close();
@@ -66,6 +69,7 @@ const FPS = 30;   // Reels play at 30; a 60 fps upload gets half its frames thro
   for (let f = 0; f < n; f++) {
     if (f % FPS === 0) report(f, 'rendering');
     await page.evaluate((x) => window.renderFrame(x), f / FPS);
+    await settle();
     const png = await page.screenshot({ type: 'png' });
     if (!ff.stdin.write(png)) await new Promise((r) => ff.stdin.once('drain', r));
   }
