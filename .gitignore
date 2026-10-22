@@ -23,3 +23,12 @@ motion/**/sfx.json
 motion/**/beats.json
 motion/**/meta.json
 motion/**/*.srt
+
+# Heavy or regenerable files stay local
+explainer/frames/themes/field/*.png
+assets/sfx/**
+!assets/sfx/README.md
+
+# Agent configs stay local
+.claude/
+CLAUDE.md
