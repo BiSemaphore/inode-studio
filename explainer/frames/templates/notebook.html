@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Three-page video: 1 the problem (field), 2 the notebook sheet, 3 Binary Semaphore.
+     Copy to motion/<group>/<piece>/page.html, then replace every TODO. Beats in this skeleton:
+     0 problem; 1 to 7 the sheet; 8 brand. The sheet is 2160 x 3840: header row y 120 to 560,
+     cells of about 970 x 700, the bottom row ends by y 2960; "save this page" sits at y 3030. -->
+<title>TODO two to four words</title>
+<link rel="stylesheet" href="../../../explainer/frames/themes/field.css">
+<link rel="stylesheet" href="../../../explainer/frames/themes/notebook.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Caveat:wght@500;700&family=JetBrains+Mono:wght@500&display=swap">
+</head>
+<body>
+
+<!-- page 1: the problem -->
+<div class="frame" data-from="0" data-to="0">
+  <div class="el hand" style="top:560px" data-at="b0">TODO small line</div>
+  <div class="el brush" style="top:640px" data-at="w0:TODO">TODO HEADLINE.</div>
+  <svg class="art" width="1080" height="1920">
+    <ellipse class="el" data-at="b0" cx="528" cy="1402" rx="30" ry="7" fill="var(--shadow)"/>
+    <use class="el ink" data-at="b0" href="#think" transform="translate(540 1400) scale(1.15)"/>
+  </svg>
+</div>
+
+<!-- page 2: the notebook sheet -->
+<div class="frame notebook" data-from="1" data-to="7">
+  <div id="canvas">
+    <div class="h w" style="left:0;width:2160px;text-align:center;top:170px;font-size:140px" data-w="b1-0.2|0.8">TODO TITLE</div>
+    <div class="t w dim" style="left:0;width:2160px;text-align:center;top:335px" data-w="b1|0.6">TODO subtitle</div>
+
+    <svg class="cv" width="2160" height="3840">
+      <!-- ruled edges that run past each other at the corners -->
+      <path class="pen edge" data-t0="b1-0.3" data-t1="b1+0.2" d="M 60 124 C 700 120, 1400 126, 2104 120"/>
+      <path class="pen edge" data-t0="b1-0.1" data-t1="b1+0.4" d="M 2050 70 C 2054 1100, 2048 2100, 2052 3014"/>
+      <path class="pen edge" data-t0="b1+0.1" data-t1="b1+0.6" d="M 2104 2962 C 1400 2966, 700 2958, 58 2964"/>
+      <path class="pen edge" data-t0="b1+0.3" data-t1="b1+0.8" d="M 112 3016 C 108 2100, 114 1100, 110 68"/>
+      <!-- section lines in the second pen: header, centre column, rows -->
+      <path class="pen divide" data-t0="b1+0.5" data-t1="b1+0.9" d="M 70 562 C 700 558, 1400 566, 2094 560"/>
+      <path class="pen divide" data-t0="b1+0.7" data-t1="b1+1.1" d="M 1078 520 C 1082 1200, 1076 2200, 1080 3004"/>
+      <path class="pen divide" data-t0="b2" data-t1="b2+0.4" d="M 70 1262 C 700 1258, 1400 1266, 2094 1260"/>
+      <path class="pen divide" data-t0="b4" data-t1="b4+0.4" d="M 70 1962 C 700 1966, 1400 1958, 2094 1962"/>
+      <path class="pen divide" data-t0="b6" data-t1="b6+0.4" d="M 70 2662 C 700 2658, 1400 2666, 2094 2660"/>
+      <!-- a connector (yellow marker): drawn in the zoomed-out view at the end of its beat -->
+      <path class="pen yelp" data-head="1" id="c1" d="M 900 900 C 980 900, 1100 900, 1180 900"/>
+      <!-- a little ink person in a cell -->
+      <g class="el" data-at="b1+1"><ellipse cx="900" cy="1182" rx="28" ry="6" fill="rgba(4,22,12,.45)"/><use class="ink" href="#point" transform="translate(900 1180) scale(1.2) scale(-1 1)"/></g>
+    </svg>
+
+    <!-- cell 1 (top left); write each note with class "w" and data-w="spec|seconds" -->
+    <div class="h w" style="left:170px;top:610px" data-w="w1:TODO|0.6">1 · TODO</div>
+    <div class="t w" style="left:190px;top:740px" data-w="w1:TODO|0.8">TODO note</div>
+    <div class="m w" style="left:190px;top:840px" data-w="w1:TODO|0.8">code_or_numbers()</div>
+
+    <div class="t w yel" style="left:0;width:2160px;text-align:center;top:3030px;font-size:56px" data-w="w7:TODO+0.6|0.8">save this page</div>
+  </div>
+</div>
+
+<!-- page 3: Binary Semaphore -->
+<div class="frame" data-from="8" data-to="8">
+  <svg class="el" data-at="b8" style="position:absolute;left:376px;top:520px" width="330" height="275"><use href="#bmark" width="330" height="275"/></svg>
+  <div class="el brush" style="top:880px;font-size:82px;white-space:nowrap" data-at="w8:Binary">BINARY SEMAPHORE</div>
+  <div class="el hand" style="top:1000px" data-at="w8:build">ai and developer tools</div>
+  <div class="el" style="position:absolute;left:0;right:0;text-align:center;top:1080px;font:500 36px 'JetBrains Mono',monospace;color:var(--cream);opacity:.7" data-at="w8:tools.">binarysemaphore.com</div>
+</div>
+<div class="frame" data-from="end" data-to="end">
+  <svg style="position:absolute;left:376px;top:520px" width="330" height="275"><use href="#bmark" width="330" height="275"/></svg>
+  <div class="brush" style="top:880px;font-size:82px;white-space:nowrap">BINARY SEMAPHORE</div>
+  <div class="hand" style="top:1000px">ai and developer tools</div>
+  <div style="position:absolute;left:0;right:0;text-align:center;top:1080px;font:500 36px 'JetBrains Mono',monospace;color:var(--cream);opacity:.7">binarysemaphore.com</div>
+</div>
+
+<script>
+  // camera: zoom to a sheet point per beat (cell centres: left x 600, right x 1580; rows y 910, 1610, 2310, 2810)
+  window.NOTEBOOK = { regions: { 1: [600, 910] }, out: [1], connectors: { c1: 1 }, checks: [] };
+  window.CIRCLE = {};   // {beat: "phrase to circle in the subtitle"}
+</script>
+<script src="../../../explainer/frames/notebook.js"></script>
+<script src="../../../explainer/frames/themes/field.js"></script>
+<script src="../../../explainer/frames/runtime.js"></script>
+</body>
+</html>
