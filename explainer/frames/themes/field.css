@@ -3,7 +3,7 @@
    thread, cream brush capitals for the one line that matters, handwritten small-caps
    notes with drawn arrows, handwritten subtitles with a red circled phrase. */
 @import url('https://fonts.googleapis.com/css2?family=Mansalva&family=Patrick+Hand+SC&display=swap');
-:root { --field: #0C3A21; --cream: #F7F3DA; --thread: #E8483B; --shadow: rgba(4,22,12,.45); }
+:root { --field: #0C3A21; --cream: #F7F3DA; --thread: #E8483B; --warn: #FF9B8A; --shadow: rgba(4,22,12,.45); }
 * { box-sizing: border-box; margin: 0; }
 html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--field); }
 .frame { position: absolute; inset: 0; opacity: 0; overflow: hidden; background: var(--field); color: var(--cream); }
@@ -18,10 +18,10 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--
   color: var(--cream); filter: url(#dry); }
 .hand { position: absolute; left: 0; right: 0; text-align: center; font: 400 46px/1.2 'Patrick Hand SC', cursive; letter-spacing: .08em; }
 .note { position: absolute; font: 400 38px/1.25 'Patrick Hand SC', cursive; letter-spacing: .1em; opacity: .92; white-space: nowrap; }
-.red { color: var(--thread); }
+.red { color: var(--warn); }   /* text: light warning red; --thread is for lines only */
 svg.art { position: absolute; left: 0; top: 0; overflow: visible; }
 .ink { fill: none; stroke: var(--cream); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
-.thread { fill: none; stroke: var(--thread); stroke-width: 3; stroke-linecap: round; }
+.thread { fill: none; stroke: var(--thread); stroke-width: 4; stroke-linecap: round; }
 .pen-ink { fill: none; stroke: var(--cream); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .sheet { fill: var(--field); stroke: var(--cream); stroke-width: 3; stroke-linejoin: round; }
 .sheet.plan { stroke: var(--thread); }

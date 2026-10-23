@@ -16,7 +16,6 @@
 //   data-fill="t0spec|t1spec"                             width grows 0 -> 100% (progress bar)
 //   data-pulse="t0spec|t1spec"                            rings while working
 //   <div class="stack" data-t0 data-t1 data-cap="9">     lines appear in turn; scrolls up once more than cap
-// Frames with class "grid" get ruler numbers on both edges (blueprint theme).
 (function () {
   const TM = window.TIMINGS, NB = TM.length;
   const END = TM[NB - 1].end + 0.35, TOTAL = END + (window.END_HOLD || 2.0);
@@ -33,39 +32,6 @@
     return w[1] + off;
   }
   const all = (sel) => [...document.querySelectorAll(sel)];
-
-  // rulers on grid frames: a number every 180 px, like a cutting mat
-  all('.frame.grid').forEach((f) => {
-    for (const side of ['l', 'r']) {
-      for (let y = 180, n = 5; y < 1920; y += 180, n += 5) {
-        const d = document.createElement('div');
-        d.className = 'ruler ' + side; d.style.top = y - 12 + 'px'; d.textContent = n;
-        f.appendChild(d);
-      }
-      for (let y = 36; y < 1920; y += 36) {               // ticks between the numbers
-        if (y % 180 === 0) continue;
-        const k = document.createElement('div');
-        k.className = 'tick ' + side; k.style.top = y + 'px';
-        f.appendChild(k);
-      }
-    }
-    // data-construct: dashed angle lines and a protractor arc from the lower-left corner
-    if (f.hasAttribute('data-construct')) {
-      const ox = 90, oy = 1800, R = 760, NS = 'http://www.w3.org/2000/svg';
-      const s = document.createElementNS(NS, 'svg');
-      s.setAttribute('class', 'construct'); s.setAttribute('width', 1080); s.setAttribute('height', 1920);
-      const col = f.classList.contains('mist') ? 'rgba(28,66,80,.28)' : 'rgba(217,201,138,.30)';
-      let inner = `<path d="M ${ox + R} ${oy} A ${R} ${R} 0 0 0 ${ox} ${oy - R}" stroke="${col}" stroke-width="2" fill="none"/>`;
-      for (const deg of [15, 30, 45, 60]) {
-        const a = deg * Math.PI / 180, x = ox + 1400 * Math.cos(a), y = oy - 1400 * Math.sin(a);
-        inner += `<path d="M ${ox} ${oy} L ${x} ${y}" stroke="${col}" stroke-width="2" stroke-dasharray="10 12"/>`;
-        const lx = ox + (R * 0.42) * Math.cos(a) + 6, ly = oy - (R * 0.42) * Math.sin(a) - 8;
-        inner += `<text x="${lx}" y="${ly}" font-family="JetBrains Mono" font-size="22" fill="${col}">${deg}°</text>`;
-      }
-      s.innerHTML = inner;
-      f.insertBefore(s, f.firstChild);
-    }
-  });
 
   const frames = all('.frame').map((f, k) => {
     const a = f.dataset.from, z = f.dataset.to;
@@ -162,7 +128,7 @@
           const at = ns.findIndex((_, i) => p.every((x, j) => ns[i + j] === x));
           if (at >= 0) {
             // keep the circled phrase on one line
-            const keep = document.createElement('span'); keep.style.whiteSpace = 'nowrap'; keep.style.opacity = 1;
+            const keep = document.createElement('span'); keep.style.whiteSpace = 'nowrap'; keep.style.opacity = 1; keep.style.padding = '0 12px';
             spans[at].before(keep);
             spans.slice(at, at + p.length).forEach((sp) => keep.appendChild(sp));
             sub.circle = { a: spans[at], z: spans[at + p.length - 1], at: ws[at + p.length - 1][1] };
@@ -178,15 +144,15 @@
       const prev = sub.el.style.opacity; sub.el.style.opacity = 1;
       const br = sub.el.getBoundingClientRect(), ra = sub.circle.a.getBoundingClientRect(), rz = sub.circle.z.getBoundingClientRect();
       const x0 = ra.left - br.left - 2, x1 = rz.right - br.left - 4, y0 = Math.min(ra.top, rz.top) - br.top - 4, y1 = Math.max(ra.bottom, rz.bottom) - br.top + 2;
-      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, rx = (x1 - x0) / 2 + 4, ry = (y1 - y0) / 2 + 6;
+      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, rx = (x1 - x0) / 2 + 2, ry = (y1 - y0) / 2 + 6;
       let d = '';
       for (let i = 0; i <= 48; i++) {                       // a pen loop that overshoots its start
-        const th = -2.5 + (i / 48) * (Math.PI * 2 + 0.45), g = 1 + 0.05 * (i / 48);
+        const th = -2.5 + (i / 48) * (Math.PI * 2 + 0.3), g = 1 + 0.03 * (i / 48);
         d += (i ? ' L ' : 'M ') + (cx + rx * g * Math.cos(th)).toFixed(1) + ' ' + (cy + ry * g * Math.sin(th)).toFixed(1);
       }
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('class', 'sub-loop'); svg.setAttribute('width', br.width); svg.setAttribute('height', br.height);
-      svg.innerHTML = `<path d="${d}" fill="none" stroke-width="4" stroke-linecap="round"/>`;
+      svg.innerHTML = `<path d="${d}" fill="none" stroke-width="8" stroke-linecap="round"/>`;
       sub.el.appendChild(svg);
       const path = svg.firstChild, L = path.getTotalLength();
       path.style.strokeDasharray = `${L} ${L}`;
@@ -198,7 +164,7 @@
       // back-to-back lines swap in one frame (no fade, no empty frame between them); a line
       // fades only when it starts or ends a run.
       const n = subs[i + 1];
-      if (n && n.t0 - (s.t1 + 0.9) < 0.25) { s.t1 = n.t0; s.cut = true; n.cutIn = true; } else s.t1 = s.t1 + 0.9;
+      if (n && n.t0 - (s.t1 + 0.9) < 0.25) { s.t1 = n.t0; s.cut = true; n.cutIn = true; } else s.t1 = Math.min(s.t1 + 0.9, END);
     });
   }
 
@@ -210,7 +176,7 @@
       if (loop) loop.path.style.strokeDashoffset = loop.L * (1 - ease(clamp((t - loop.at) / 0.45)));
     });
     frames.forEach(({ f, t0, t1, k }) => {
-      f.style.opacity = clamp((t - t0) / 0.3) * (t < t1 + 0.3 ? 1 : 0);
+      f.style.opacity = (k === 0 ? 1 : clamp((t - t0) / 0.3)) * (t < t1 + 0.3 ? 1 : 0);   // frame 0 is up from t = 0
       f.style.zIndex = k;
     });
     els.forEach(({ e, at, out, base }) => {

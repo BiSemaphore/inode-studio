@@ -1,0 +1,49 @@
+/* Theme "punch" (approved 2026-10-22 as the "18-inspired" look; studies/18-green-get-up.md,
+   studies/18-inspired.png). Flat deep green, a small setup line, one huge lowercase punchline
+   with a full stop, and tiny flat-colour figures in the lower third that contradict the words.
+   Works vertical (1080x1920) and landscape (1440x1080, LinkedIn); punch.js draws the figures.
+   Load field.css first (frames, .el, subtitles), then this file. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap');
+:root { --field: #0B452C; --cream: #F2ECDE; --yel: #F8EB44; --grass: #3E8A5A; }
+html, body, .frame { background: var(--field); }
+.small { position: absolute; left: 0; right: 0; top: 700px; text-align: center; font: 800 46px/1.2 Inter, sans-serif;
+  letter-spacing: -0.02em; color: var(--cream); }
+.huge { position: absolute; left: 0; right: 0; top: 760px; text-align: center; font: 900 250px/1 Inter, sans-serif;
+  letter-spacing: -0.06em; color: var(--cream); white-space: nowrap; }
+.huge > span { display: inline-block; }
+svg.art { width: 1080px; height: 1920px; }
+/* pages draw figures at scale 1.5 on a 1360 baseline; the scene shrinks them so the word is many times
+   the figure (tiny human, huge field), with the feet at 1330 */
+svg.art > .scene { transform-origin: 540px 1360px; transform: translateY(-30px) scale(.66); }
+/* no grain: fine noise is what video compression breaks first (owner saw it when zooming) */
+#grain { display: none; opacity: .16; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+
+/* subtitles: plain Inter under the figures; the key phrase gets a yellow pen loop */
+.sub-bubble { bottom: 400px; left: 140px; right: 140px; }   /* above the caption overlay, clear of the button column */
+.sub-text { font: 700 44px/1.3 Inter, sans-serif; letter-spacing: -0.01em; color: var(--cream); text-shadow: none; }
+.sub-loop path { stroke: var(--yel); }
+
+/* the brand, tiny and quiet at the bottom centre of every frame (owner: never distracting) */
+#wm { position: absolute; left: 0; right: 0; bottom: 58px; z-index: 60; display: flex; justify-content: center; align-items: center;
+  gap: 13px; font: 600 27px/1 Inter, sans-serif; letter-spacing: -0.02em; color: var(--cream); opacity: .66; }
+#wm .wmark { height: 52px; width: auto; display: block; overflow: visible; }
+#wm b { color: #E8483B; font-weight: 600; }
+
+/* end card */
+.endname { position: absolute; left: 0; right: 0; text-align: center; font: 900 84px/1 Inter, sans-serif; letter-spacing: -0.04em; color: var(--cream); }
+.endsub { position: absolute; left: 0; right: 0; text-align: center; font: 700 38px/1 Inter, sans-serif; color: var(--cream); opacity: .7; }
+
+/* landscape (LinkedIn 4:3): same page, words higher, the scene lifted and centred, subtitles low */
+@media (orientation: landscape) {
+  html, body { width: 1920px; height: 1080px; }
+  .small { top: 210px; font-size: 40px; }
+  .huge { top: 262px; font-size: 200px; }
+  svg.art { width: 1920px; height: 1080px; }
+  svg.art > .scene { transform: translate(420px, -520px) scale(.75); }
+  .sub-bubble { bottom: 90px; left: 360px; right: 360px; }   /* clear of LinkedIn's player bar */
+  .sub-text { font-size: 38px; }
+  #wm { bottom: 40px; font-size: 23px; gap: 11px; } #wm .wmark { height: 46px; }
+  .endname, .endsub { translate: 0 -420px; }
+  .endmark { translate: 420px -420px; }
+}
