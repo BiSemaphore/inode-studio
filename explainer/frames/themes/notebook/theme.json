@@ -1,0 +1,27 @@
+{
+ "name": "notebook",
+ "title": "Notebook",
+ "status": "approved 2026-10-22 (default explainer format)",
+ "extends": "field",
+ "use_for": "Three-page explainers on the field look: the problem, one notebook sheet the camera zooms into and out of, the brand page.",
+ "load": {
+  "css": [
+   "themes/base/base.css",
+   "themes/field/field.css",
+   "themes/notebook/notebook.css"
+  ],
+  "js_before_runtime": [
+   "themes/notebook/notebook.js",
+   "themes/field/field.js"
+  ],
+  "js_after_runtime": []
+ },
+ "components": {
+  "sheet": "window.NOTEBOOK = { regions, out, connectors, checks } drives the camera (see notebook.js header)",
+  "pens": "ink2, yelp (yellow marker connectors), okp, redp (strikes only), bar (straight lines)"
+ },
+ "variants": {},
+ "template": "themes/notebook/template.html",
+ "example": "motion/shorts/tokens-01",
+ "preview": "brand/references/studies/field-style.png"
+}

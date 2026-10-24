@@ -131,6 +131,23 @@
     `<filter id="wmdry" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3"/></filter>` +
     `<g id="bmark-shape"><path d="${BMARK}" fill="${C.cream}"/><circle cx="246" cy="-25" r="30" fill="${DOT}"/></g></defs></svg>`;
   document.body.prepend(defs.firstChild);
+  // leafy green background for vertical posts (owner likes the field theme's dappled light):
+  // baked leaf PNGs drift slowly behind each frame, or behind the cover body. CSS hides them in
+  // landscape, so the LinkedIn cut stays flat green.
+  const leafBase = (document.currentScript && document.currentScript.src || '').replace(/[^/]*$/, '') + '../field/';   // the leaf light belongs to the field theme
+  const leafHosts = document.querySelectorAll('.frame').length ? [...document.querySelectorAll('.frame')] : [document.body];
+  const leaves = [];
+  leafHosts.forEach((h, k) => {
+    const img = document.createElement('img');
+    img.className = 'leaf soft'; img.src = leafBase + 'leaf-' + ((k % 8) + 1) + '.png';
+    const vig = document.createElement('div'); vig.className = 'vignette';
+    h.prepend(vig); h.prepend(img);
+    leaves.push({ img, k });
+  });
+  (window.ON_FRAME = window.ON_FRAME || []).push((t) => {
+    leaves.forEach(({ img, k }) => { img.style.transform = 'translate(' + (40 * Math.sin(t * 0.11 + k)).toFixed(1) + 'px,' + (30 * Math.cos(t * 0.08 + k * 1.7)).toFixed(1) + 'px)'; });
+  });
+
   if (!document.getElementById('grain')) { const g = document.createElement('div'); g.id = 'grain'; document.body.appendChild(g); }
 
   // the punchline fills at most the safe width, whatever its length; runs again once fonts are in

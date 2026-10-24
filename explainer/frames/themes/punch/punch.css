@@ -23,6 +23,7 @@ svg.art > .scene { transform-origin: 540px 1360px; transform: translateY(-30px) 
 .sub-bubble { bottom: 400px; left: 140px; right: 140px; }   /* above the caption overlay, clear of the button column */
 .sub-text { font: 700 44px/1.3 Inter, sans-serif; letter-spacing: -0.01em; color: var(--cream); text-shadow: none; }
 .sub-loop path { stroke: var(--yel); }
+.sub-text { text-shadow: 0 2px 16px rgba(4,20,10,.7); }
 
 /* the brand, tiny and quiet at the bottom centre of every frame (owner: never distracting) */
 #wm { position: absolute; left: 0; right: 0; bottom: 58px; z-index: 60; display: flex; justify-content: center; align-items: center;
@@ -37,6 +38,7 @@ svg.art > .scene { transform-origin: 540px 1360px; transform: translateY(-30px) 
 /* landscape (LinkedIn 4:3): same page, words higher, the scene lifted and centred, subtitles low */
 @media (orientation: landscape) {
   html, body { width: 1920px; height: 1080px; }
+  .leaf, .vignette { display: none; }   /* LinkedIn stays flat green */
   .small { top: 210px; font-size: 40px; }
   .huge { top: 262px; font-size: 200px; }
   svg.art { width: 1920px; height: 1080px; }

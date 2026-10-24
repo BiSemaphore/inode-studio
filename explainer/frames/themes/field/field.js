@@ -25,7 +25,7 @@
   // leaf light: two layers of one baked image per frame, drifting slowly (studies/21)
   const layers = [];
   document.querySelectorAll('.frame').forEach((f, k) => {
-    const src = `${here}field/leaf-${(k % 8) + 1}.png`;
+    const src = `${here}leaf-${(k % 8) + 1}.png`;
     for (const cls of ['soft', 'glow']) {
       const img = document.createElement('img');
       img.className = 'leaf ' + cls; img.src = src;

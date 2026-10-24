@@ -1,0 +1,23 @@
+{
+ "name": "base",
+ "title": "Base",
+ "status": "shared foundation, always loaded first",
+ "extends": null,
+ "use_for": "Not a look on its own. Every theme builds on it: frames, element timing, subtitles structure, the 16:9 stage.",
+ "load": {
+  "css": [
+   "themes/base/base.css"
+  ],
+  "js_before_runtime": [],
+  "js_after_runtime": []
+ },
+ "components": {
+  "frame": "<div class=\"frame\" data-from=\"2\" data-to=\"3\">...</div>  (one page, shown for beats 2 to 3; \"end\" = end card)",
+  "stage": "<div class=\"stage\">...</div> inside a frame: laid out for 1080x1920, scaled and centred in 16:9",
+  "timing": "data-at=\"w2:word\" (appear), data-out, data-hl, class=\"pen\" + data-t0/t1 (draw a line); full list in runtime.js"
+ },
+ "variants": {},
+ "template": null,
+ "example": null,
+ "preview": null
+}

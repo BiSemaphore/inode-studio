@@ -1,0 +1,23 @@
+/* Theme "base": what every theme shares. Load it first; a theme adds only its own look on top.
+   Frame and element visibility (runtime.js drives opacity), subtitle structure (runtime.js builds the
+   bubbles), and the 16:9 stage that LinkedIn renders scale and centre. No colours, fonts or figures here. */
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; }
+.frame { position: absolute; inset: 0; opacity: 0; overflow: hidden; }
+.el { opacity: 0; }
+svg.art { position: absolute; left: 0; top: 0; overflow: visible; }
+
+/* subtitles: runtime.js adds .sub-bubble > .sub-text > span per word, and .sub-loop for the circled phrase */
+.sub-bubble { position: absolute; left: 90px; right: 90px; bottom: 300px; z-index: 50; text-align: center; opacity: 0; }
+.sub-text { text-wrap: balance; }
+.sub-text span { opacity: 0; }
+.sub-loop { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+
+/* landscape (LinkedIn 16:9): pages laid out for the vertical screen wrap their content in .stage,
+   which is scaled and centred here; a theme may place it differently */
+.stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; }
+@media (orientation: landscape) {
+  html, body { width: 1920px; height: 1080px; }
+  .stage { transform: translate(474px, -345px) scale(.9); }
+  .stage.s-brand { transform: translate(474px, -198px) scale(.9); }
+}

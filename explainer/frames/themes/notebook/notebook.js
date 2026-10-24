@@ -26,22 +26,32 @@
   const frame = document.querySelector('.frame.notebook'), cv = document.getElementById('canvas');
   const from = +frame.dataset.from, to = +frame.dataset.to;
 
+  // a beat's zoom-out uses the pause after its last word, so notes written at the end of the
+  // beat are seen before the camera leaves
+  const outT = (k) => Math.max(TM[k].end - 0.35, (k + 1 < TM.length ? TM[k + 1].start : TM[k].end) - 0.6);
   // connectors draw while the camera is out, at the end of their beat
   Object.entries(C.connectors || {}).forEach(([id, k]) => {
-    const e = document.getElementById(id), t = TM[k].end - 0.1;
+    const e = document.getElementById(id), t = outT(k) + 0.25;
     e.dataset.t0 = t.toFixed(2); e.dataset.t1 = (t + 0.5).toFixed(2);
   });
 
   // camera keys: [time, sheet x, sheet y, scale]; each move eases over MOVE seconds from the key time
-  const OV = [1080, 1720, 0.5], Z = C.zoom || 0.88, out = new Set(C.out || []), MOVE = 0.75;
+  // the screen: vertical 1080x1920, or 16:9 landscape (LinkedIn), where the overview and the hold
+  // fit the sheet's height and the zoomed cells get the extra width
+  const LAND = innerWidth > innerHeight, CX = innerWidth / 2, CY = LAND ? innerHeight * 0.46 : 860;
+  // landscape never zooms out between rows (each row view already holds both cells); its overview
+  // and hold show rows 1 to 3 at a readable size instead of the whole tiny sheet
+  const OV = LAND ? [1080, 1640, 0.47] : [1080, 1720, 0.5], Z = LAND ? 0.86 : (C.zoom || 0.88);
+  const out = new Set(LAND ? [] : (C.out || [])), MOVE = 0.75;
   const CAM = [[TM[from].start - 0.4, ...OV]];
   let zoomed = false, prevOut = false;
   for (let k = from; k <= to; k++) {
-    const r = (C.regions || {})[k];
+    // landscape shows a whole row (both cells) at once, so nothing is cut at the screen edge
+    const r0 = (C.regions || {})[k], r = r0 && LAND ? [1080, r0[1]] : r0;
     if (r) {
       CAM.push([TM[k].start + (prevOut ? 0.35 : 0.15), r[0], r[1], Z]); zoomed = true;
       prevOut = out.has(k);
-      if (prevOut) { CAM.push([TM[k].end - 0.35, ...OV]); zoomed = false; }
+      if (prevOut) { CAM.push([outT(k), ...OV]); zoomed = false; }
     } else {
       if (zoomed) { CAM.push([TM[k].start - 0.2, ...OV]); zoomed = false; }
       prevOut = false;
@@ -49,8 +59,8 @@
   }
   if (zoomed) CAM.push([TM[to].end - 0.2, ...OV]);
   // the screenshot hold: the sheet's used rows centred on screen, a little larger than the overview
-  const [top, bottom] = C.hold || [70, 3060], HS = 0.525;
-  CAM.push([TM[to].end + 0.3, 1080, (top + bottom) / 2 - 100 / HS, HS]);
+  const [top, bottom] = C.hold || [70, 3060], HS = LAND ? 0.335 : 0.525;
+  CAM.push(LAND ? [TM[to].end + 0.3, ...OV] : [TM[to].end + 0.3, 1080, (top + bottom) / 2 - (innerHeight / 2 - CY) / HS, HS]);
 
   // sound cues for the mixer: zooms, checks, pen under every written note
   window.ZOOMS = CAM.slice(1).map(([t, , , s], i) => [t, s > CAM[i][3] ? 'in' : 'out']);
@@ -64,7 +74,8 @@
     let i = 0; while (i + 1 < CAM.length && CAM[i + 1][0] <= t) i++;
     const b = CAM[i], a = i === 0 ? b : CAM[i - 1], p = i === 0 ? 1 : ease(Math.min(1, Math.max(0, (t - b[0]) / MOVE)));
     const cx = a[1] + (b[1] - a[1]) * p, cy = a[2] + (b[2] - a[2]) * p, s = a[3] + (b[3] - a[3]) * p;
-    cv.style.transform = `translate(${540 - cx * s}px, ${860 - cy * s}px) scale(${s})`;
-    writes.forEach(({ e, t0, d }) => { const q = Math.min(1, Math.max(0, (t - t0) / d)); e.style.clipPath = `inset(-20px ${(1 - q) * 100}% -20px -20px)`; });
+    cv.style.transform = `translate(${CX - cx * s}px, ${CY - cy * s}px) scale(${s})`;
+    // once a note is fully written, the clip clears the handwriting's overhang on the right
+    writes.forEach(({ e, t0, d }) => { const q = Math.min(1, Math.max(0, (t - t0) / d)); e.style.clipPath = `inset(-20px calc(${(1 - q) * 100}% - ${q * 40}px) -20px -20px)`; });
   });
 })();

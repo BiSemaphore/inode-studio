@@ -1,0 +1,28 @@
+{
+ "name": "field",
+ "title": "Field",
+ "status": "approved 2026-10-22 (default look)",
+ "extends": "base",
+ "use_for": "Calm explainers: forest green lit through leaves, cream ink people, a red thread, brush capitals, handwritten notes.",
+ "load": {
+  "css": [
+   "themes/base/base.css",
+   "themes/field/field.css"
+  ],
+  "js_before_runtime": [
+   "themes/field/field.js"
+  ],
+  "js_after_runtime": []
+ },
+ "components": {
+  "people": "<use class=\"ink\" href=\"#stand|#think|#point|#work|#hold\" transform=\"translate(x y) scale(1.2)\"/> with an <ellipse> shadow under the feet",
+  "brush": "<div class=\"brush\">the one line that matters</div>",
+  "note": "<div class=\"note\">handwritten small caps</div>",
+  "thread": "<path class=\"thread pen\" d=\"...\"/> (red line joining things in order)",
+  "brand": "<use href=\"#bmark\"/>"
+ },
+ "variants": {},
+ "template": "themes/field/template.html",
+ "example": "motion/shorts/ai-harness-01",
+ "preview": "brand/references/studies/field-style.png"
+}

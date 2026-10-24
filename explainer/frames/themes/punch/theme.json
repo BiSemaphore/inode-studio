@@ -1,0 +1,27 @@
+{
+ "name": "punch",
+ "title": "Punch",
+ "status": "approved 2026-10-22",
+ "extends": "field",
+ "use_for": "Hooks and trend shorts: a small setup line, one huge lowercase punchline with a full stop, tiny flat figures that contradict the words.",
+ "load": {
+  "css": [
+   "themes/base/base.css",
+   "themes/field/field.css",
+   "themes/punch/punch.css"
+  ],
+  "js_before_runtime": [],
+  "js_after_runtime": [
+   "themes/punch/punch.js"
+  ]
+ },
+ "components": {
+  "words": "<div class=\"small\">setup.</div><div class=\"huge\">punch.</div>",
+  "figures": "<g data-fig=\"agent|stranger|human sit|stand|walk|keyup|shrug|bow|ask|lens|sign\"></g>",
+  "props": "<g data-prop=\"key|letter|page|podium|grass|sign:TEXT|bubble:TEXT\"></g>"
+ },
+ "variants": {},
+ "template": "themes/punch/template.html",
+ "example": "motion/shorts/prompt-injection-01-v2",
+ "preview": "brand/references/studies/18-inspired.png"
+}
