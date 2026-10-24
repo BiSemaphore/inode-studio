@@ -7,10 +7,11 @@
 //   node explainer/frames/render.js motion/<group>/<piece> 3.2 9 ...       stills -> out/still-<t>.png
 //   AUDIO_ONLY=1 node explainer/frames/render.js motion/<group>/<piece>    remix the sound onto out/<name>.mp4
 // Only the delivery files are made: one for Instagram, one for LinkedIn (--landscape); no master (owner 2026-10-24).
-// Modules: render/capture.js (Chrome, frames), render/encode.js (ffmpeg), render/workers.js (parallel),
+// Re-renders draw only what changed: 2 s chunks are cached by the hash of their drawn frames (render/workers.js).
+// Modules: render/capture.js (Chrome, frames), render/encode.js (ffmpeg), render/workers.js (parallel + cache),
 // render/progress.js (out/render-progress.json). Each worker prints a per-stage profile when it finishes.
-const path = require('path'), fs = require('fs'), { spawn, execFileSync } = require('child_process');
-const { FPS, AUDIO_ARGS, pngIn, outputs } = require('./render/encode');
+const path = require('path'), fs = require('fs'), crypto = require('crypto'), { spawn, execFileSync } = require('child_process');
+const { FPS, AUDIO_ARGS, pngIn, outputs, times } = require('./render/encode');
 const { openPage, renderRange, profileLine } = require('./render/capture');
 const { renderParallel } = require('./render/workers');
 const { progress } = require('./render/progress');
@@ -26,7 +27,7 @@ const cfg = { landscape, dsf: draft ? 1 : +((args.find((a) => a.startsWith('--sc
 // 4 Chromes by default: measured 9.2 frames/s at 2x vs 6.7 with 2 and 10.4 with 6 (CPU-bound past 4); memory stays
 // about 50% free on 16 GB now that no master is encoded (2026-10-24)
 const workers = Math.max(1, +(flag('--workers') || 4));
-const stills = args.slice(1).filter((x, i, all) => !x.startsWith('--') && !['--workers', '--segment'].includes(all[i - 1])).map(Number);
+const stills = args.slice(1).filter((x, i, all) => !x.startsWith('--') && !['--workers', '--segment', '--chunks', '--cache', '--key'].includes(all[i - 1])).map(Number);
 
 // one worker: a frame range into a video-only segment; reports "F <done>" lines to the parent
 async function segment(spec) {
@@ -40,8 +41,35 @@ async function segment(spec) {
   process.exit(0);
 }
 
+// one worker of a cached render: for each chunk "i:a:b", fingerprint its frames; reuse the cached chunk if its key
+// exists, else draw and encode it into the cache. Reports "F <frames done>" and "K <i> <key> <new|cached>".
+async function chunks(spec, cacheDir, base) {
+  const { browser, frame, prof, fingerprint } = await openPage(dir, cfg), t0 = performance.now();
+  let total = 0;
+  for (const part of spec.split(',')) {
+    const [i, a, b] = part.split(':').map(Number);
+    const marks = [];
+    for (const t of times(a, b, cfg.blur)) marks.push(await fingerprint(t));
+    const key = crypto.createHash('sha1').update(base + marks.join(',')).digest('hex').slice(0, 20);
+    const file = path.join(cacheDir, key + '.mp4');
+    const cached = fs.existsSync(file);
+    if (!cached) {
+      const tmp = file.replace(/\.mp4$/, '.tmp.mp4');
+      const ff = spawn('ffmpeg', ['-v', 'error', '-y', ...pngIn(cfg.blur), ...outputs(cfg, tmp, false)], { stdio: ['pipe', 'inherit', 'inherit'] });
+      await renderRange(frame, a, b, ff, (k) => { if (k % 10 === 0) process.stdout.write(`F ${total + k}\n`); }, cfg.blur, prof);
+      fs.renameSync(tmp, file);
+    }
+    total += b - a;
+    process.stdout.write(`F ${total}\nK ${i} ${key} ${cached ? 'cached' : 'new'}\n`);
+  }
+  if (prof.n) console.error(profileLine(prof, t0, `${spec.split(',').length} chunks`));
+  await Promise.race([browser.close(), new Promise((r) => setTimeout(r, 5000))]);
+  process.exit(0);
+}
+
 (async () => {
   fs.mkdirSync(path.join(dir, 'out'), { recursive: true });
+  if (flag('--chunks')) return chunks(flag('--chunks'), flag('--cache'), flag('--key'));
   if (flag('--segment')) return segment(flag('--segment'));
 
   const { browser, page, frame, settle } = await openPage(dir, cfg);

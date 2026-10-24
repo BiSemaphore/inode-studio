@@ -36,7 +36,22 @@ async function openPage(dir, cfg) {
     prof.draw += b - a; prof.settle += c - b; prof.shot += now() - c; prof.n++;
     return png;
   };
-  return { browser, page, frame, settle, prof };
+  // what can be seen at time t, as a short hash (FNV-1a): the head (styles), the body's attributes, and the full
+  // markup of every visible top-level layer (elements, inline styles, text); a hidden layer counts only as hidden,
+  // so editing one card changes only the frames that show it. Same fingerprint, same engine files and settings,
+  // same pixels: a cached chunk can be reused.
+  const fingerprint = (t) => page.evaluate((x) => {
+    window.renderFrame(x);
+    let s = document.head.outerHTML + [...document.body.attributes].map((a) => a.name + '=' + a.value).join(' ');
+    for (const el of document.body.children) {
+      const cs = getComputedStyle(el);
+      s += cs.display === 'none' || cs.opacity === '0' ? '<hidden ' + el.tagName + '>' : el.outerHTML;
+    }
+    let h = 0x811c9dc5;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    return h.toString(36) + '.' + s.length.toString(36);
+  }, t);
+  return { browser, page, frame, settle, prof, fingerprint };
 }
 
 // draw output frames [a, b) into ffmpeg's stdin; onFrame(output frames done) as it goes

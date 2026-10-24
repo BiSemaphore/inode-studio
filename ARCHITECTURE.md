@@ -68,6 +68,13 @@ each output frame blends a pair): a 65 s video takes about 10 minutes per shape;
 The settle wait stays at the proven `full` setting; see `render/capture.js` for what each faster setting broke.
 Only delivery files are written: no masters.
 
+Re-renders draw only what changed. Frames are cut into 2 s chunks; each chunk is cached in `out/cache/` under a
+hash of what is visible in every one of its frames (fingerprinted from the page state, about 1 ms a frame) plus the
+engine and theme files, timings and settings. Measured on a 65 s draft: first render 77 s, unchanged re-render
+10 s, one word changed on one card 27 s (6 of 33 chunks drawn, the rest reused; result identical to a fresh
+render apart from Chrome's own sub-pixel text jitter). An edit to an engine or theme file redraws everything.
+`--draft` (1x, no blur, `<name>-draft.mp4`) is for previews.
+
 ## Rules that are enforced, not remembered
 
 - `.claude/hooks/prepublish.sh`: no publish without verified narration, 0 broken frames and a minimal caption.
