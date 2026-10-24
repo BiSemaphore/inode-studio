@@ -17,7 +17,7 @@ pointing to the next one.
 
 | # | Topic | Hook | The math, in one line | Measure locally | Status |
 |---|---|---|---|---|---|
-| 1 | Tokens | Why AI cannot count the r's in "strawberry" | Text becomes pieces of words, then numbers | Yes: run a tokenizer on real words | idea |
+| 1 | Tokens | Why AI cannot count the r's in "strawberry" | Text becomes pieces of words, then numbers | Yes: run a tokenizer on real words | rendered (tokens-01) |
 | 2 | Embeddings | How AI knows "king" is close to "queen" | Words are points; closeness is the angle between them (cosine) | Yes: embed words, print similarities | idea |
 | 3 | Attention | How each word looks at every other word | Score = query dot key, divided by the square root of the size | Partly: tiny example by hand | idea |
 | 4 | Softmax and temperature | Why "creative" mode makes things up | Scores become chances: divide by temperature, then softmax | Yes: same prompt at 0, 0.7, 1.5 | idea |
@@ -59,3 +59,10 @@ pointing to the next one.
 ## Trend shorts
 
 News as it happens, 30 to 45 seconds, in the punchline look. Add here when a story breaks.
+
+## Parked for discussion (owner, 2026-10-24)
+
+Not decided yet; talk before scripting. Details: `ideas/2026-10-24-content-direction.md`.
+- Content direction "AI, from first principles to production": maths, then code, then real systems, as one series.
+- A video about the Pi coding agent (pi.dev): how a minimal agent harness works and why it keeps the core small.
+

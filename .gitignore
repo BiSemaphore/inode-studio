@@ -26,9 +26,14 @@ motion/**/*.srt
 
 # Heavy or regenerable files stay local
 explainer/frames/themes/field/*.png
+explainer/frames/themes/card/*.png
 assets/sfx/**
 !assets/sfx/README.md
 
 # Agent configs stay local
 .claude/
 CLAUDE.md
+
+# Compressed old pieces stay local; only the index is tracked
+archive/*
+!archive/INDEX.md
