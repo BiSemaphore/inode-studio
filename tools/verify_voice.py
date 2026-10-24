@@ -13,7 +13,8 @@ Spelled-out words ("S-T-R" for the token "str", said on purpose with letter phon
 back into one word before comparing. A beat under 0.85 gets a second opinion from
 medium.en (small.en often keeps "spelling" after a spelled word: "berry" became "B-R-E"); the
 better match counts and the report names the model. Every word given exact phonemes in "say"
-([[word|...]]) must be heard as that word by one of the two models, or the beat fails.
+([[word|...]]) must be heard as that word by one of the two models, or the beat fails. A brand the
+transcriber cannot spell may list its correct hearings under "heard_as" in beats.json (reviewed by hand).
 """
 import difflib
 import json
@@ -26,7 +27,8 @@ import soundfile as sf
 from faster_whisper import WhisperModel
 
 piece = pathlib.Path(sys.argv[1])
-beats = json.loads((piece / "beats.json").read_text())["beats"]
+script = json.loads((piece / "beats.json").read_text())
+beats, heard_as = script["beats"], {k.lower(): v for k, v in script.get("heard_as", {}).items()}
 timings = json.loads((piece / "voice/timings.json").read_text())
 timings = timings["beats"] if isinstance(timings, dict) else timings
 x, sr = sf.read(str(piece / "voice/voice.wav"), dtype="float32")
@@ -55,7 +57,10 @@ for b, t in zip(beats, timings):
     # every word given exact phonemes ([[word|...]]) must be heard as that word, or the beat fails: a whole
     # sentence can score high while its one tech term is wrong ("embedding" was heard as "Emma bedding")
     marked = [m.lower() for m in re.findall(r"\[\[([^|\]]+)\|", b.get("say", ""))]
-    unheard = lambda h: [m for m in marked if not set(words(m)) <= set(words(h))]
+    # a brand the transcriber cannot spell may list its correct hearings in beats.json "heard_as"
+    # (for example "qwen": ["qen", "kwen"]); a wrong sound ("gwen") stays a failure
+    ok_as = lambda m: [m] + [a.lower() for a in heard_as.get(m, [])]
+    unheard = lambda h: [m for m in marked if not any(set(words(a)) <= set(words(h)) for a in ok_as(m))]
     if ratio < 0.85 or unheard(heard):
         second = second or WhisperModel("medium.en", device="cpu", compute_type="int8")
         h2 = hear(second, seg16)
@@ -68,7 +73,7 @@ for b, t in zip(beats, timings):
     terms = [w.strip(".,:;!?") for w in b["show"].split() if re.search(r"[A-Z].*[A-Z]|\d|\w\.\w", w)]
     missing = [w for w in terms if w.lower().replace(".", "") not in heard.lower().replace(".", "")]
     flag = "ok  " if ratio >= 0.85 else "DIFF"
-    lines.append(f"{flag} {ratio:.2f}  [{b['id']}]{by}" + (f"  NOT HEARD: {', '.join(unheard(heard))}" if unheard(heard) else "") + "\n   script: {b['show']}\n   heard:  {heard}"
+    lines.append(f"{flag} {ratio:.2f}  [{b['id']}]{by}" + (f"  NOT HEARD: {', '.join(unheard(heard))}" if unheard(heard) else "") + f"\n   script: {b['show']}\n   heard:  {heard}"
                  + (f"\n   listen: {', '.join(missing)}" if missing else ""))
 
 status = "OK" if worst >= 0.85 else "FAIL"
