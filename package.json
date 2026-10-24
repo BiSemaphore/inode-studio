@@ -12,6 +12,7 @@
     "motion": "node tools/record.js motion/$npm_config_piece/piece.html motion/$npm_config_piece/out",
     "video": "scripts/video.sh $npm_config_piece",
     "progress": "scripts/progress.sh",
+    "status": ".venv/bin/python tools/render_status.py --watch",
     "publish": ".venv/bin/python tools/publish.py motion/$npm_config_piece"
   },
   "devDependencies": {
