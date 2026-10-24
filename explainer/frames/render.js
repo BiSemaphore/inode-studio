@@ -3,6 +3,7 @@
 //   ... --scale=2                                                          draw at 2x, shrunk to 1080x1920 (cleaner)
 //   ... --landscape                                                        1920x1080 (16:9) for LinkedIn -> out/<name>-landscape.mp4
 //   ... --no-blur                                                          plain 30 fps (default: drawn at 60 fps, pairs blended into 30)
+//   ... --draft                                                            quick preview: 1x, no blur -> out/<name>-draft.mp4 (never the final)
 //   node explainer/frames/render.js motion/<group>/<piece> 3.2 9 ...       stills -> out/still-<t>.png
 //   AUDIO_ONLY=1 node explainer/frames/render.js motion/<group>/<piece>    remix the sound onto out/<name>.mp4
 // Only the delivery files are made: one for Instagram, one for LinkedIn (--landscape); no master (owner 2026-10-24).
@@ -17,10 +18,10 @@ const root = path.resolve(__dirname, '../..');
 
 const args = process.argv.slice(2), dir = path.resolve(args[0]), name = path.basename(dir);
 const flag = (k) => { const i = args.indexOf(k); return i < 0 ? null : args[i + 1]; };
-const landscape = args.includes('--landscape');
+const landscape = args.includes('--landscape'), draft = args.includes('--draft');
 // motion blur is the default for renders (owner 2026-10-24): frames drawn at 60 fps, each output frame blends a pair,
 // so swipes, zooms and pens move smoothly; it doubles render time. --no-blur for a plain 30 fps draft.
-const cfg = { landscape, dsf: +((args.find((a) => a.startsWith('--scale=')) || '=1').split('=')[1]), blur: !args.includes('--no-blur'),
+const cfg = { landscape, dsf: draft ? 1 : +((args.find((a) => a.startsWith('--scale=')) || '=1').split('=')[1]), blur: !draft && !args.includes('--no-blur'),
   w: landscape ? 1920 : 1080, h: landscape ? 1080 : 1920 };
 // 4 Chromes by default: measured 9.2 frames/s at 2x vs 6.7 with 2 and 10.4 with 6 (CPU-bound past 4); memory stays
 // about 50% free on 16 GB now that no master is encoded (2026-10-24)
@@ -60,7 +61,7 @@ async function segment(spec) {
     pops: [], whooshes: [], misses: [], hits: [], chord: [end], thumps: [],
     draws: cues.draws, taps: cues.taps, brushes: cues.brushes, moves: cues.moves, cuts: cues.cuts, zooms: cues.zooms, checks: cues.checks, bed: 'ambient', kit: 'recorded' }));
   execFileSync(path.join(root, '.venv/bin/python'), [path.join(root, 'explainer/mix.py'), dir], { stdio: 'inherit' });
-  const out = path.join(dir, 'out', name + (landscape ? '-landscape' : '') + '.mp4'), audio = path.join(dir, 'audio.wav');
+  const out = path.join(dir, 'out', name + (landscape ? '-landscape' : '') + (draft ? '-draft' : '') + '.mp4'), audio = path.join(dir, 'audio.wav');
 
   if (process.env.AUDIO_ONLY) {   // remix the soundtrack onto the existing video, no frames rendered
     if (fs.existsSync(out)) {
