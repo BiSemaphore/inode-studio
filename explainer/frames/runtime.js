@@ -173,7 +173,8 @@
     subs.forEach(({ el, spans, ws, t0, t1, loop, cut, cutIn }) => {
       el.style.opacity = (cutIn ? (t >= t0 ? 1 : 0) : clamp((t - t0) / 0.12)) * (cut ? (t < t1 ? 1 : 0) : 1 - clamp((t - t1) / 0.12));
       spans.forEach((s, i) => { s.style.opacity = i === 0 || t >= ws[i][1] - 0.04 ? 1 : 0; });   // never an empty bubble
-      if (loop) loop.path.style.strokeDashoffset = loop.L * (1 - ease(clamp((t - loop.at) / 0.45)));
+      if (loop) { loop.path.style.strokeDashoffset = loop.L * (1 - ease(clamp((t - loop.at) / 0.45)));
+        loop.path.style.visibility = t < loop.at ? 'hidden' : 'visible'; }   // its round end cap would show as a dot
     });
     frames.forEach(({ f, t0, t1, k }) => {
       f.style.opacity = (k === 0 ? 1 : clamp((t - t0) / 0.3)) * (t < t1 + 0.3 ? 1 : 0);   // frame 0 is up from t = 0

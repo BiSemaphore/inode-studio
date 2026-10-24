@@ -20,7 +20,8 @@ html, body { background: var(--page); }
 .word { font-weight: 800; font-size: 60px; letter-spacing: -.03em; white-space: nowrap; }
 .note { font-weight: 700; font-size: 32px; line-height: 1.25; letter-spacing: -.01em; color: var(--grey); white-space: nowrap; opacity: .92; }
 .cap { font-weight: 700; font-size: 38px; letter-spacing: -.02em; color: var(--grey); text-align: center; }
-.cap.now { color: var(--ink); }   /* the current and the next part in a series deck */
+.cap.now { color: var(--ink); }
+.card.cream ~ .note { color: #5E5A54; opacity: 1; }   /* 6.1:1 on cream; the default grey is 4.1:1 there */   /* the current and the next part in a series deck */
 .forest { color: var(--forest); }
 svg.art { width: 1080px; height: 1920px; }
 /* strokes: every coloured stroke at least 7 px (compression); straight lines need class bar (no wobble) */
@@ -40,7 +41,7 @@ svg.art { width: 1080px; height: 1920px; }
   font: 700 36px/1.2 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; color: var(--ink); }
 .vec .n { text-align: right; } .vec .name { font: 800 44px/1.2 Inter, sans-serif; letter-spacing: -.02em; text-align: right; }
 .math { position: absolute; font: italic 500 56px/1.2 'STIX Two Text', serif; color: var(--ink); white-space: nowrap; }
-.math .up { font-style: normal; } .math sub { font-size: .62em; font-style: normal; }
+.math .up { font-style: normal; } .math sub { font-size: .62em; font-style: normal; margin-right: .12em; }   /* digits and operators upright: wrap them in .up */
 .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 .2em; }
 .frac > span:first-child { border-bottom: 3px solid currentColor; padding: 0 .2em .06em; }
 .frac > span:last-child { padding: .06em .2em 0; }
@@ -79,7 +80,7 @@ body[data-page="green"] #wm { color: #F2ECDE; opacity: .66; }
   .sub-text { font-size: 42px; }
   /* the stage is shown at .72: keep strokes at 7 px or more and small text readable after the shrink */
   .ln { stroke-width: 7; } .fst { stroke-width: 10; } .thr { stroke-width: 13; } .yel { stroke-width: 18; }
-  .note { font-size: 38px; } .cap { font-size: 48px; }
+  .note { font-size: 38px; } .cap { font-size: 42px; white-space: nowrap; }
   #wm { bottom: 34px; font-size: 22px; } #wm svg { height: 36px; }
   body[data-page="green"] { background: #0C462C url('surface-green-wide.png') 0 0 / 1920px 1080px no-repeat; }
 }
