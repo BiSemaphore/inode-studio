@@ -8,7 +8,7 @@ const AUDIO_ARGS = ['-c:a', 'aac', '-b:a', '256k', '-ar', '48000'];
 // tune animation: flat colour and hard edges (more B-frames, softer deblocking)
 const ENCODE = [
   '-c:v', 'libx264', '-preset', 'slow', '-tune', 'animation', '-crf', '14', '-maxrate', '16M', '-bufsize', '32M',
-  '-profile:v', 'high', '-level', '4.2',
+  '-profile:v', 'high', '-level', '4.2', '-r', String(FPS), '-fps_mode', 'cfr',   // constant 30 fps: chunks join without drift
   '-x264-params', 'aq-mode=3:colorprim=bt709:transfer=bt709:colormatrix=bt709', '-g', String(FPS * 2),
   '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv'];
 
