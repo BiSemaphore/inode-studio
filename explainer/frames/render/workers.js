@@ -9,7 +9,7 @@ async function renderParallel({ script, dir, n, workers, cfg, out, audio, report
   fs.mkdirSync(segDir, { recursive: true });
   const ranges = [...Array(workers)].map((_, i) => [Math.round((n * i) / workers), Math.round((n * (i + 1)) / workers)]);
   const done = ranges.map(() => 0);
-  const flags = [...(cfg.blur ? ['--blur'] : []), ...(cfg.landscape ? ['--landscape'] : []), ...(cfg.dsf > 1 ? [`--scale=${cfg.dsf}`] : [])];
+  const flags = [cfg.blur ? '--blur' : '--no-blur', ...(cfg.landscape ? ['--landscape'] : []), ...(cfg.dsf > 1 ? [`--scale=${cfg.dsf}`] : [])];
   report(0, 'rendering', workers);
   const codes = await Promise.all(ranges.map(([a, b], i) => new Promise((resolve) => {
     const child = spawn(process.execPath, [script, dir, '--segment', `${a}:${b}:${path.join(segDir, `seg-${i}.mp4`)}`, ...flags],

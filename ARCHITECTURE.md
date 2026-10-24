@@ -63,7 +63,8 @@ gives), then run `tools/themes.py check`. Never edit an approved theme's look fo
 ## Rendering, measured (2026-10-24, 16 GB Mac)
 
 Per frame at `--scale=2`: screenshot about 260 ms (the bottleneck), settle wait about 65 ms, drawing 1 ms, encoder wait
-under 10 ms. 4 workers by default (9.2 frames/s; 6 gives only 10.4). A 65 s video takes about 5 minutes per shape.
+under 10 ms. 4 workers by default (9.2 frames/s; 6 gives only 10.4). Motion blur is the default (drawn at 60 fps,
+each output frame blends a pair): a 65 s video takes about 10 minutes per shape; `--no-blur` halves that for drafts.
 The settle wait stays at the proven `full` setting; see `render/capture.js` for what each faster setting broke.
 Only delivery files are written: no masters.
 
