@@ -23,5 +23,16 @@
  "variants": {},
  "template": "themes/notebook/template.html",
  "example": "motion/shorts/tokens-01",
- "preview": "brand/references/studies/field-style.png"
+ "preview": "brand/references/studies/field-style.png",
+ "sound": {
+  "taps": [
+   "kenney/interface-sounds/drop_00*.ogg",
+   "kenney/interface-sounds/tick_00*.ogg"
+  ],
+  "draws": [
+   "kenney/interface-sounds/scratch_00*.ogg"
+  ],
+  "lands": [],
+  "bed": "warm"
+ }
 }

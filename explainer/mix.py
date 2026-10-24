@@ -8,13 +8,21 @@ Effects reuse tools/sound.py in its "mac" style, including the recorded Mac
 keys (eklee, qubodup, CC BY 3.0: credit them in the post caption). Frames pieces also
 get drawn sound (pen scratch, paper taps, headline swish, air on moves and cuts) and an
 ambient bed kept in the range phone speakers play. The bed ducks under the voice.
+
+Variety (owner 2026-10-24: "you're using the same sound"): the random choices are seeded from the piece's
+name, so every video picks its own takes but the same video always mixes the same way. Which sounds a
+piece uses comes from its theme's "sound" palette in explainer/frames/themes/<name>/theme.json (taps,
+draws, lands, bed), and the bed varies per piece: one of four chord progressions, transposed, with the
+bar length and the style (warm, bright, pulse) from the theme.
 """
 
 import json
 import pathlib
+import re
 import subprocess
 import sys
 import wave
+import zlib
 
 import numpy as np
 
@@ -59,13 +67,25 @@ def swish():
     return band(rng.standard_normal(n), 700, 4200) * e + 0.6 * np.pad(sound.thump(), (0, max(0, n - len(sound.thump()))))[:n]
 
 
-def ambient(total):
-    """Slow warm chords (8 s each) and faint air. Partials sit at 200 Hz to 3 kHz so a phone plays them."""
+# four progressions (MIDI notes, root first): F Dm C Bb, C Am F G, Dm Bb C Am, G Em C D
+PROGRESSIONS = [
+    [[53, 60, 64, 67, 72], [50, 57, 62, 65, 69], [48, 55, 60, 64, 67], [46, 53, 58, 62, 65]],
+    [[48, 55, 60, 64, 67], [45, 52, 57, 60, 64], [41, 48, 53, 57, 60], [43, 50, 55, 59, 62]],
+    [[50, 57, 62, 65, 69], [46, 53, 58, 62, 65], [48, 55, 60, 64, 67], [45, 52, 57, 60, 64]],
+    [[55, 62, 67, 71, 74], [52, 59, 64, 67, 71], [48, 55, 60, 64, 67], [50, 57, 62, 66, 69]],
+]
+
+
+def ambient(total, style="warm", seed=0):
+    """Slow chords and faint air. Partials sit at 200 Hz to 3 kHz so a phone plays them.
+    seed picks the progression, a transpose of -3..+3 semitones and a bar of 7, 8 or 9 s.
+    style: warm (soft pad), bright (upper voices an octave up, lighter), pulse (pad plus a soft plucked arpeggio)."""
     n = int(total * SR)
     tt = np.arange(n) / SR
     out = np.zeros(n)
-    chords = [[53, 60, 64, 67, 72], [50, 57, 62, 65, 69], [48, 55, 60, 64, 67], [46, 53, 58, 62, 65]]
-    bar, k = 8.0, 0
+    shift = (seed // 4) % 7 - 3
+    chords = [[m + shift + (12 if style == "bright" and q else 0) for q, m in enumerate(c)] for c in PROGRESSIONS[seed % 4]]
+    bar, k = 7.0 + (seed // 28) % 3, 0
     while k * bar < total:
         i0, j = int(k * bar * SR), min(n, int((k * bar + bar + 3.0) * SR))
         t = np.arange(j - i0) / SR
@@ -75,6 +95,15 @@ def ambient(total):
             for det in (-0.08, 0.0, 0.08):
                 ph = 2 * np.pi * f * 2 ** (det / 12) * t + 0.4 * np.sin(2 * np.pi * 0.2 * t + q)
                 out[i0:j] += (np.sin(ph) + 0.35 * np.sin(2 * ph) + 0.12 * np.sin(3 * ph)) * a * (0.6 if q == 0 else 1.0)
+        if style == "pulse":   # a soft plucked arpeggio over the pad, two notes a second
+            for b in range(int(bar * 2)):
+                i = i0 + int(b * 0.5 * SR)
+                if i >= n:
+                    break
+                m = chords[k % 4][1 + b % (len(chords[k % 4]) - 1)] + 12
+                d = min(n - i, int(0.45 * SR))
+                tp = np.arange(d) / SR
+                out[i:i + d] += 0.9 * np.sin(2 * np.pi * sound.NOTE(m) * tp) * np.exp(-tp / 0.12)
         k += 1
     out = band(out, 180, 3200)
     air = band(rng.standard_normal(n), 300, 1500) * (0.6 + 0.4 * np.sin(2 * np.pi * 0.06 * tt))
@@ -118,8 +147,29 @@ def stretch_take(x, dur):
     return y
 
 
-def kit_effects(e, sfx):
-    """Recorded sounds: owner downloads in incoming/ first, Kenney CC0 accents otherwise."""
+def pick_any(patterns):
+    """A random file from the union of several globs (a theme palette entry), or None."""
+    files = sorted({f for p in patterns for f in LIB.glob(p) if f.suffix.lower() in (".ogg", ".wav", ".mp3", ".flac", ".m4a")})
+    return sample(files[int(rng.integers(len(files)))]) if files else None
+
+
+DEFAULT_PALETTE = {"taps": ["kenney/interface-sounds/drop_00*.ogg"], "draws": ["kenney/interface-sounds/scratch_00[123].ogg"],
+                   "lands": [], "bed": "warm"}
+
+
+def palette_of(piece):
+    """The theme's sound palette: meta.json "theme", else the last theme stylesheet page.html loads."""
+    meta = piece / "meta.json"
+    name = json.loads(meta.read_text()).get("theme") if meta.exists() else None
+    if not name and (piece / "page.html").exists():
+        found = re.findall(r"themes/([a-z]+)/\1\.css", (piece / "page.html").read_text())
+        name = found[-1] if found else None
+    tj = pathlib.Path(__file__).resolve().parent / "frames" / "themes" / str(name) / "theme.json"
+    return name, (json.loads(tj.read_text()).get("sound") if tj.exists() else None) or DEFAULT_PALETTE
+
+
+def kit_effects(e, sfx, pal):
+    """Recorded sounds: owner downloads in incoming/ first, then the theme palette (Kenney CC0)."""
     for t, d in e.get("draws", []):
         rec = pick("incoming/*write*") or pick("incoming/*pen*") or pick("incoming/*marker*")
         if rec is not None:
@@ -127,10 +177,10 @@ def kit_effects(e, sfx):
         else:   # a soft pencil grain: short scratches along the stroke
             k = 0.0
             while k < d:
-                sound.place(sfx, pick("kenney/interface-sounds/scratch_00[123].ogg"), t + k, 0.025, rng.uniform(-0.2, 0.2))
+                sound.place(sfx, pick_any(pal["draws"]), t + k, 0.025, rng.uniform(-0.2, 0.2))
                 k += rng.uniform(0.09, 0.14)
     for t in e.get("taps", []):
-        sound.place(sfx, pick("kenney/interface-sounds/drop_00*.ogg"), t, 0.035, rng.uniform(-0.2, 0.2))
+        sound.place(sfx, pick_any(pal["taps"]), t, 0.035, rng.uniform(-0.2, 0.2))
     for t in e.get("brushes", []):
         sound.place(sfx, pick("kenney/impact-sounds/impactSoft_medium_00*.ogg"), t - 0.02, 0.10, 0)
     for t, kind in e.get("zooms", []):
@@ -146,6 +196,8 @@ def kit_effects(e, sfx):
         sound.place(sfx, sound.whoosh(0.4 + 0.3 * min(d, 1.0)), t, 0.02, 0)
     for t in e.get("cuts", []):
         sound.place(sfx, sound.whoosh(0.8), t - 0.05, 0.018, 0)
+        if pal.get("lands"):   # card theme: the next card lands on the table
+            sound.place(sfx, pick_any(pal["lands"]), t + 0.4, 0.05, rng.uniform(-0.1, 0.1))
 
 
 def music_bed(total):
@@ -175,7 +227,11 @@ def load_voice(path):
 
 
 def main(piece):
+    global rng
     piece = pathlib.Path(piece)
+    seed = zlib.crc32(piece.resolve().name.encode())   # same piece, same mix; another piece, other takes
+    rng = np.random.default_rng(seed)
+    theme, pal = palette_of(piece)
     e = json.loads((piece / "sfx.json").read_text())
     total = e["total"]
     n = int(total * SR)
@@ -200,7 +256,7 @@ def main(piece):
     for t in e.get("thumps", []):
         sound.place(sfx, sound.thump(), t, 0.22)
     if e.get("kit") == "recorded":
-        kit_effects(e, sfx)
+        kit_effects(e, sfx, pal)
     else:
         for t, d in e.get("draws", []):
             sound.place(sfx, pen(d), t, 0.022, rng.uniform(-0.15, 0.15))
@@ -226,7 +282,7 @@ def main(piece):
         # about 20 dB under the voice while she speaks, about 14 dB in the gaps
         vr = np.sqrt(np.mean(vbuf[np.abs(vbuf) > 0.01] ** 2)) * 1.6
         bed = music_bed(total) if e.get("kit") == "recorded" else None
-        bed = ambient(total) if bed is None else bed / (np.sqrt(np.mean(bed ** 2)) + 1e-9)
+        bed = ambient(total, pal.get("bed", "warm"), seed) if bed is None else bed / (np.sqrt(np.mean(bed ** 2)) + 1e-9)
         mus = bed * vr * 10 ** (-14 / 20) * (1 - 0.5 * env)
     else:
         mus = sound.music(total) * 0.5 * (1 - 0.65 * env)
@@ -249,8 +305,8 @@ def main(piece):
                     f"volume={-15.5 - integrated:.2f}dB,alimiter=limit=0.79:attack=2:release=60:level=disabled",
                     "-ar", str(SR), str(piece / "audio.wav")], check=True)
     pathlib.Path(raw).unlink()
-    print(f"{piece / 'audio.wav'}: {total:.2f}s, {len(e['keys'])} keys, "
-          f"{len(e['pops'])} pops, {len(e['whooshes'])} camera moves")
+    print(f"{piece / 'audio.wav'}: {total:.2f}s, theme {theme}, bed {pal.get('bed', 'warm')} "
+          f"(progression {seed % 4}, transpose {(seed // 4) % 7 - 3:+d}, bar {7 + (seed // 28) % 3} s)")
 
 
 if __name__ == "__main__":

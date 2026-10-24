@@ -23,5 +23,16 @@
  "variants": {},
  "template": "themes/punch/template.html",
  "example": "motion/shorts/prompt-injection-01-v2",
- "preview": "brand/references/studies/18-inspired.png"
+ "preview": "brand/references/studies/18-inspired.png",
+ "sound": {
+  "taps": [
+   "kenney/impact-sounds/impactWood_light_00*.ogg",
+   "kenney/impact-sounds/impactGeneric_light_00*.ogg"
+  ],
+  "draws": [
+   "kenney/interface-sounds/scratch_00*.ogg"
+  ],
+  "lands": [],
+  "bed": "pulse"
+ }
 }

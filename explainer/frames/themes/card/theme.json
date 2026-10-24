@@ -28,5 +28,20 @@
  },
  "template": "themes/card/template.html",
  "example": "motion/shorts/embeddings-01-v2",
- "preview": "brand/references/studies/embeddings-v2-green.png"
+ "preview": "brand/references/studies/embeddings-v2-green.png",
+ "sound": {
+  "taps": [
+   "kenney/interface-sounds/click_00*.ogg",
+   "kenney/interface-sounds/tick_00*.ogg",
+   "kenney/interface-sounds/pluck_00*.ogg"
+  ],
+  "draws": [
+   "kenney/interface-sounds/scratch_00*.ogg"
+  ],
+  "lands": [
+   "kenney/impact-sounds/impactSoft_medium_00*.ogg",
+   "kenney/impact-sounds/impactPlank_medium_00*.ogg"
+  ],
+  "bed": "bright"
+ }
 }

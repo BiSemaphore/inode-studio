@@ -24,5 +24,15 @@
  "variants": {},
  "template": "themes/field/template.html",
  "example": "motion/shorts/ai-harness-01",
- "preview": "brand/references/studies/field-style.png"
+ "preview": "brand/references/studies/field-style.png",
+ "sound": {
+  "taps": [
+   "kenney/interface-sounds/drop_00*.ogg"
+  ],
+  "draws": [
+   "kenney/interface-sounds/scratch_00*.ogg"
+  ],
+  "lands": [],
+  "bed": "warm"
+ }
 }
