@@ -36,7 +36,7 @@ def line(d, age, bar_view=False):
     tail = (f"ETA {eta // 60}:{eta % 60:02d}, done about {d['finish_at']}" if eta is not None and d["state"] == "rendering"
             else "joining chunks" if d["state"] == "joining" else d["state"])
     stale = f"  (no update for {int(age)} s: stopped?)" if d["state"] == "rendering" and age > 120 else ""
-    fps = f"  {d['fps']} fps" if d.get("fps") else ""
+    fps = f"  render speed {d['fps']} frames/s" if d.get("fps") else ""
     workers = f"  {d['workers']} workers" if d.get("workers", 1) > 1 else ""
     if not bar_view:
         return f"{d['piece']}: {d['state']} {d['pct']}% ({d['frame']}/{d['frames']} frames{workers}){fps}, {tail}{stale}"

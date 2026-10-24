@@ -1,7 +1,7 @@
 // Live progress for a render, written two ways:
 //   out/render-progress.json, read by tools/render_status.py (any terminal can watch any render);
 //   the render's own output: in a terminal, one line redrawn in place like a package manager,
-//     embeddings-01-v2  [==============>               ]  48%  940/1951 frames  9.4 fps  ETA 1:47
+//     embeddings-01-v2  [==============>               ]  48%  940/1951 frames  render speed 9.4 frames/s  ETA 1:47
 //   and, when the output goes to a file (a background job's log), one plain line every 5% instead.
 const path = require('path'), fs = require('fs');
 
@@ -20,7 +20,7 @@ function progress(dir, name, n) {
     fs.writeFileSync(file, JSON.stringify({ piece: name, frame: f, frames: n, pct, state, workers: workers || 1, elapsed_s: Math.round(secs),
       fps: Math.round(fps * 10) / 10, eta_s: eta === null ? null : Math.round(eta),
       finish_at: eta === null ? null : new Date(Date.now() + eta * 1000).toLocaleTimeString() }));
-    const text = `${name}  ${bar(pct)} ${String(pct).padStart(3)}%  ${f}/${n} frames  ${fps.toFixed(1)} fps  ` +
+    const text = `${name}  ${bar(pct)} ${String(pct).padStart(3)}%  ${f}/${n} frames  render speed ${fps.toFixed(1)} frames/s  ` +
       (state === 'rendering' ? `ETA ${eta === null ? '?' : mmss(eta)}` : state === 'joining' ? 'joining chunks' : `done in ${mmss(secs)}`);
     if (tty) {
       if (state === 'rendering' && Date.now() - lastDraw < 150) return;   // redraw at most about 7 times a second
