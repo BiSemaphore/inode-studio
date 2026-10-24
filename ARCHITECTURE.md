@@ -17,8 +17,8 @@ render              explainer/frames/render.js          4 Chromes draw PNG frame
 sound               explainer/mix.py                    cues from the page (pen, taps, cuts) + ambient bed -> audio.wav
 check               tools/check_video.py                every frame decoded and checked for breaks
 cover + caption     cover.html, meta.json               clean covers in both shapes; layered caption
-publish (local)     tools/publish.py                    copies the finished files into videos/<group>/<slug>/ (nothing goes online)
-post                videos/POSTING.md                   the queue: what to post next, which file per platform
+publish (local)     tools/publish.py                    copies the finished files into videos/<topic>/<part>/<version>/ (nothing goes online)
+post                videos/POSTING.md                   the queue (generated): what to post next, which folder; --posted marks one done
 ```
 
 ## Folders
@@ -33,7 +33,7 @@ post                videos/POSTING.md                   the queue: what to post 
 | `explainer/*` (build.py, kit.js, scenes.py, ...) | the older whiteboard kit, used only by the first inode episodes |
 | `tools/` | small single-purpose scripts (themes, new piece, verify, check, publish, status, surface/leaf bakers) |
 | `motion/<group>/<slug>/` | a video's sources (not in git): beats, page, voice, run, out |
-| `videos/<group>/<slug>/` | finished files to post (not in git); `videos/POSTING.md` is the queue |
+| `videos/<topic>/[<part>/]<version>/` | finished files to post (not in git): instagram.mp4, linkedin.mp4, both covers, caption.txt; `videos/POSTING.md` is the generated queue |
 | `archive/` | compressed old or replaced pieces; `archive/INDEX.md` says what each is and how to restore it |
 | `brand/references/` | the owner's references and study cards (`studies/`) |
 | `.claude/` | the playbook skill, the reviewer and fact-checker agents, hooks |
