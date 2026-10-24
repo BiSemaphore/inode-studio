@@ -25,16 +25,22 @@ def rows():
     return out
 
 
-def line(d, age, bar=False):
-    left = (f"{d['eta_s'] // 60} min {d['eta_s'] % 60:02d} s left, done about {d['finish_at']}"
-            if d.get("eta_s") is not None and d["state"] == "rendering" else "")
+def bar(pct, width=30):
+    """The same bar the renderer draws: [=========>          ]"""
+    full = int(pct / 100 * width)
+    return "[" + ("=" * width if full >= width else "=" * max(0, full - 1) + (">" if full else "") + " " * (width - full)) + "]"
+
+
+def line(d, age, bar_view=False):
+    eta = d.get("eta_s")
+    tail = (f"ETA {eta // 60}:{eta % 60:02d}, done about {d['finish_at']}" if eta is not None and d["state"] == "rendering"
+            else "joining chunks" if d["state"] == "joining" else d["state"])
     stale = f"  (no update for {int(age)} s: stopped?)" if d["state"] == "rendering" and age > 120 else ""
-    workers = f", {d['workers']} workers" if d.get("workers", 1) > 1 else ""
-    head = f"{d['piece']}: {d['state']} {d['pct']}% ({d['frame']}/{d['frames']} frames{workers})"
-    if not bar:
-        return f"{head}, {left}{stale}" if left else head + stale
-    filled = int(d["pct"] / 100 * 30)
-    return f"{head}\n  [{'#' * filled}{'.' * (30 - filled)}] {left}{stale}"
+    fps = f"  {d['fps']} fps" if d.get("fps") else ""
+    workers = f"  {d['workers']} workers" if d.get("workers", 1) > 1 else ""
+    if not bar_view:
+        return f"{d['piece']}: {d['state']} {d['pct']}% ({d['frame']}/{d['frames']} frames{workers}){fps}, {tail}{stale}"
+    return f"{d['piece']}  {bar(d['pct'])} {d['pct']:3d}%  {d['frame']}/{d['frames']} frames{fps}{workers}\n  {tail}{stale}"
 
 
 def main():
@@ -51,7 +57,7 @@ def main():
             sys.stdout.write("\033[2J\033[H")   # clear the terminal, cursor home
             print(time.strftime("%H:%M:%S"), " renders (Ctrl-C to stop)\n")
             for d, age in found:
-                print(line(d, age, bar=True) + "\n")
+                print(line(d, age, bar_view=True) + "\n")
             if not found:
                 print("no render in progress")
             if not any(d["state"] in ("rendering", "encoding", "joining") for d, _ in found):

@@ -19,7 +19,8 @@ function baseKey(dir, cfg) {
   const files = [path.join(dir, 'voice', 'timings.json')];
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).forEach((e) => {
     const f = path.join(d, e.name);
-    if (e.isDirectory()) walk(f); else if (/\.(js|css|json|png|woff2?)$/.test(e.name)) files.push(f);
+    // progress.js and workers.js only report and schedule; they never change a pixel
+    if (e.isDirectory()) walk(f); else if (/\.(js|css|json|png|woff2?)$/.test(e.name) && !/^(progress|workers)\.js$/.test(e.name)) files.push(f);
   });
   walk(frames);
   for (const f of files.sort()) { h.update(f); h.update(fs.readFileSync(f)); }
@@ -38,12 +39,18 @@ async function renderParallel({ script, dir, n, workers, cfg, out, audio, report
   const groups = [...Array(workers)].map((_, w) => chunks.map((c, i) => [i, ...c]).filter(([i]) => i % workers === w)).filter((g) => g.length);
   const done = groups.map(() => 0), keys = [];
   let reused = 0;
+  const profiles = [];   // workers' profile lines, printed after the progress bar so they never break it
   const flags = [cfg.blur ? '--blur' : '--no-blur', ...(cfg.landscape ? ['--landscape'] : []), ...(cfg.dsf > 1 ? [`--scale=${cfg.dsf}`] : [])];
   report(0, 'rendering', groups.length);
   const codes = await Promise.all(groups.map((g, w) => new Promise((resolve) => {
     const spec = g.map(([i, a, b]) => `${i}:${a}:${b}`).join(',');
     const child = spawn(process.execPath, [script, dir, '--chunks', spec, '--cache', cacheDir, '--key', base, ...flags],
-      { stdio: ['ignore', 'pipe', 'inherit'] });
+      { stdio: ['ignore', 'pipe', 'pipe'] });
+    let ebuf = '';
+    child.stderr.on('data', (d) => {
+      ebuf += d; const lines = ebuf.split('\n'); ebuf = lines.pop();
+      for (const l of lines) if (l.startsWith('profile ')) profiles.push(l); else if (l) process.stderr.write('\n' + l + '\n');
+    });
     let buf = '';
     child.stdout.on('data', (d) => {   // workers report "F <frames done>", "K <chunk> <key> <new|cached>"
       buf += d; const lines = buf.split('\n'); buf = lines.pop();
@@ -66,6 +73,7 @@ async function renderParallel({ script, dir, n, workers, cfg, out, audio, report
   const used = new Set(keys.map((k) => k + '.mp4'));
   for (const f of fs.readdirSync(cacheDir)) if (f.endsWith('.mp4') && !used.has(f)) fs.rmSync(path.join(cacheDir, f));
   report(n, 'done', groups.length);
+  profiles.forEach((l) => console.error(l));
   console.log(`chunks: ${chunks.length - reused} drawn, ${reused} reused from the cache`);
 }
 
