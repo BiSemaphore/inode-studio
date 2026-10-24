@@ -1,0 +1,85 @@
+/* Theme "card" (owner 2026-10-23; studies/40-42-cards.md, studies/43-47-characters.md, studies/card-style.png,
+   studies/cast-style.png). One card per idea on a constant warm white page; the card swipes away and the next
+   one lands. On the card: punch type (Inter 800 setup line, Inter 900 lowercase punchline with a full stop),
+   our people (card.js: data-doodle, thin stick people), the yellow pen and the red thread. Lines may run off the card onto the page.
+   The page never changes colour; only cards (white, cream, yellow) and what is on them vary.
+   Extends base only (load themes/base/base.css first), then runtime.js and card.js. No other theme is needed.
+   Every page wraps its content in <div class="stage"> so card.js can deal it in and swipe it out. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=JetBrains+Mono:wght@500;700;800&family=STIX+Two+Text:ital,wght@0,500;1,500&display=swap');
+:root { --page: #EFEBE3; --paper: #FFFFFF; --cream: #F7F3DA; --yellow: #F2CC2E; --ink: #111111; --forest: #0B452C;
+  --red: #E8483B; --grey: #6E6A63; }
+html, body { background: var(--page); }
+.frame { background: transparent; color: var(--ink); }    /* the page shows through, so the old card is seen leaving */
+.card { position: absolute; left: 108px; top: 250px; width: 864px; height: 1220px; border-radius: 56px; background: var(--paper);
+  box-shadow: 0 30px 60px rgba(0,0,0,.14), 0 4px 10px rgba(0,0,0,.07); }
+.card.cream { background: var(--cream); } .card.yellow { background: var(--yellow); }
+.small, .big, .word, .note, .cap, .num { position: absolute; font-family: Inter, sans-serif; }
+.small { left: 108px; width: 864px; top: 370px; text-align: center; font-weight: 800; font-size: 44px; letter-spacing: -.02em; }
+.big { left: 108px; width: 864px; top: 432px; text-align: center; font-weight: 900; font-size: 200px; line-height: 1;
+  letter-spacing: -.06em; white-space: nowrap; }
+.word { font-weight: 800; font-size: 60px; letter-spacing: -.03em; white-space: nowrap; }
+.note { font-weight: 700; font-size: 32px; line-height: 1.25; letter-spacing: -.01em; color: var(--grey); white-space: nowrap; opacity: .92; }
+.cap { font-weight: 700; font-size: 38px; letter-spacing: -.02em; color: var(--grey); text-align: center; }
+.cap.now { color: var(--ink); }   /* the current and the next part in a series deck */
+.forest { color: var(--forest); }
+svg.art { width: 1080px; height: 1920px; }
+/* strokes: every coloured stroke at least 7 px (compression); straight lines need class bar (no wobble) */
+.ln { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; filter: url(#dry); }
+.ln.bar, .yel.bar { filter: none; }   /* a straight path has an empty box, so the wobble filter would erase it */
+.yel { fill: none; stroke: var(--yellow); stroke-width: 14; stroke-linecap: round; filter: url(#dry); }
+.thr { fill: none; stroke: var(--red); stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; filter: url(#dry); }
+.fst { fill: none; stroke: var(--forest); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; filter: url(#dry); }
+.dash { fill: none; stroke: var(--grey); stroke-width: 5; stroke-dasharray: 4 14; stroke-linecap: round; }
+/* people and icons: one thin line, the same on screen at any scale (card.js draws them) */
+.d { fill: none; stroke: currentColor; stroke-width: 5.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; filter: url(#hand); }
+.d.thin { stroke-width: 4; } .d.yel { stroke: var(--yellow); stroke-width: 7; }   /* a person's colour comes from data-color */
+.dashed { fill: none; stroke: var(--ink); stroke-width: 5.5; stroke-linecap: round; stroke-dasharray: 16 20; filter: url(#hand); }
+.dashed.red { stroke: var(--red); stroke-width: 7; }
+/* numbers are written as numbers: JetBrains Mono, tabular, true minus signs; math in STIX Two with italic variables */
+.vec { position: absolute; display: grid; column-gap: 18px; row-gap: 14px; align-items: baseline;
+  font: 700 36px/1.2 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; color: var(--ink); }
+.vec .n { text-align: right; } .vec .name { font: 800 44px/1.2 Inter, sans-serif; letter-spacing: -.02em; text-align: right; }
+.math { position: absolute; font: italic 500 56px/1.2 'STIX Two Text', serif; color: var(--ink); white-space: nowrap; }
+.math .up { font-style: normal; } .math sub { font-size: .62em; font-style: normal; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 .2em; }
+.frac > span:first-child { border-bottom: 3px solid currentColor; padding: 0 .2em .06em; }
+.frac > span:last-child { padding: .06em .2em 0; }
+.num { font: 800 60px/1 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.hl { background: linear-gradient(176deg, transparent 52%, var(--yellow) 52%, var(--yellow) 90%, transparent 90%) no-repeat;
+  background-size: 0% 100%; padding: 0 6px; }
+
+/* subtitles: plain Inter in ink on the page under the card; the key phrase gets a red pen loop */
+.sub-bubble { left: 120px; right: 120px; bottom: 300px; }
+.sub-text { font: 700 44px/1.3 Inter, sans-serif; letter-spacing: -.01em; color: var(--ink); text-shadow: none; }
+.sub-loop path { stroke: var(--red); }
+
+/* the brand: tiny and quiet at the bottom of every frame */
+#wm { position: absolute; left: 0; right: 0; bottom: 58px; z-index: 60; display: flex; justify-content: center; align-items: center;
+  gap: 12px; font: 600 27px/1 Inter, sans-serif; letter-spacing: -.02em; color: var(--ink); opacity: .55; }
+#wm svg { height: 44px; width: auto; display: block; overflow: visible; }
+#wm b { color: var(--red); font-weight: 600; }
+.endname { position: absolute; left: 108px; width: 864px; text-align: center; font: 900 84px/1 Inter, sans-serif; letter-spacing: -.04em; }
+.endsub { position: absolute; left: 108px; width: 864px; text-align: center; font: 700 38px/1 Inter, sans-serif; color: var(--grey); }
+
+/* <body data-page="green">: the same cards on the green paper surface of the "get up." pin (owner 2026-10-24, the "V2"
+   look; brand/references/18-green-get-up-brand.png). Our own texture, baked to match it: tools/make_surface.py. Only the
+   surface around the cards changes; whatever sits on the page itself turns cream. */
+html:has(body[data-page="green"]) { background: #0C462C; }
+body[data-page="green"] { background: #0C462C url('surface-green.png') 0 0 / 1080px 1920px no-repeat; }
+body[data-page="green"] .onpage { color: #F2ECDE; }
+body[data-page="green"] .onpage .hl { background: none; color: #F8EB44; }
+body[data-page="green"] .sub-text { color: #F2ECDE; text-shadow: 0 2px 16px rgba(4,20,10,.7); }
+body[data-page="green"] .sub-loop path { stroke: #F8EB44; }
+body[data-page="green"] #wm { color: #F2ECDE; opacity: .66; }
+
+/* landscape (LinkedIn 16:9): the portrait card stays a card, centred on the wide page; subtitles to its right */
+@media (orientation: landscape) {
+  .stage, .stage.s-brand { transform: translate(571px, -79px) scale(.72); }
+  .sub-bubble { left: 1320px; right: 70px; top: 380px; bottom: auto; background: none; padding: 0; text-align: left; }
+  .sub-text { font-size: 42px; }
+  /* the stage is shown at .72: keep strokes at 7 px or more and small text readable after the shrink */
+  .ln { stroke-width: 7; } .fst { stroke-width: 10; } .thr { stroke-width: 13; } .yel { stroke-width: 18; }
+  .note { font-size: 38px; } .cap { font-size: 48px; }
+  #wm { bottom: 34px; font-size: 22px; } #wm svg { height: 36px; }
+  body[data-page="green"] { background: #0C462C url('surface-green-wide.png') 0 0 / 1920px 1080px no-repeat; }
+}

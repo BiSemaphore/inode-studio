@@ -1,0 +1,32 @@
+{
+ "name": "card",
+ "title": "Card",
+ "status": "approved 2026-10-24",
+ "extends": "base",
+ "use_for": "Series and math explainers: one idea per card on a plain page; the card swipes away and the next lands. Thin coloured stick people, line icons, vectors in JetBrains Mono, math in STIX Two.",
+ "load": {
+  "css": [
+   "themes/base/base.css",
+   "themes/card/card.css"
+  ],
+  "js_before_runtime": [],
+  "js_after_runtime": [
+   "themes/card/card.js"
+  ]
+ },
+ "components": {
+  "card": "<div class=\"card [cream|yellow]\"></div> inside <div class=\"stage\">",
+  "words": "<div class=\"small\">setup</div><div class=\"big\">punchline.</div>",
+  "people": "<g data-doodle=\"stand|point|think|fast|heavy|reads|wonders|sits\" data-color=\"cobalt|tomato|violet|teal|magenta|forest\" transform=\"translate(x y) scale(.7)\"></g>",
+  "icons": "<g data-doodle=\"pin|idea|choice\"></g>",
+  "vector": "<div class=\"vec\">name = [ n n n ... ]</div> (grid of spans: .name, .n)",
+  "math": "<div class=\"math\">cos θ = <span class=\"frac\"><span>a · b</span><span>‖a‖ ‖b‖</span></span></div>",
+  "lines": "class=\"pen ln|fst|thr|yel\" (+ bar when straight); .dashed for paths; text on the page itself gets .onpage"
+ },
+ "variants": {
+  "page": "white (default) | green: <body data-page=\"green\"> (green paper surface, tools/make_surface.py)"
+ },
+ "template": "themes/card/template.html",
+ "example": "motion/shorts/embeddings-01-v2",
+ "preview": "brand/references/studies/embeddings-v2-green.png"
+}
