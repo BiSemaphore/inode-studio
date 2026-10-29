@@ -1,0 +1,18 @@
+{
+ "name": "blueprint",
+ "title": "Blueprint",
+ "status": "draft 2026-10-29 (secondary pattern; style frames brand/references/studies/blueprint-style.png)",
+ "extends": "base",
+ "use_for": "LinkedIn and secondary videos: cobalt blueprint grid with rulers, white line doodles, Chewy + Gaegu type.",
+ "load": {"css": ["themes/base/base.css", "themes/blueprint/blueprint.css"], "js_before_runtime": [], "js_after_runtime": ["kinetic.js", "themes/blueprint/blueprint.js"]},
+ "sound": {
+  "bed": "warm",
+  "named": {
+   "shutter": {"files": ["typography-terms/shutter-*.mp3"], "level": 0.14},
+   "pen": {"files": ["typography-terms/pen-*.mp3"], "level": 0.10},
+   "thump": {"files": ["typography-terms/thump-*.mp3"], "level": 0.18},
+   "tick": {"files": ["typography-terms/tick-*.mp3"], "level": 0.10, "max": 0.32},
+   "sticker": {"files": ["typography-terms/sticker-*.mp3"], "level": 0.10, "max": 0.7}
+  }
+ }
+}

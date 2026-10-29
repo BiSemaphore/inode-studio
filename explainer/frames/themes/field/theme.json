@@ -33,6 +33,40 @@
    "kenney/interface-sounds/scratch_00*.ogg"
   ],
   "lands": [],
-  "bed": "warm"
+  "bed": "warm",
+  "named": {
+   "shutter": {
+    "files": [
+     "typography-terms/shutter-*.mp3"
+    ],
+    "level": 0.14
+   },
+   "pen": {
+    "files": [
+     "typography-terms/pen-*.mp3"
+    ],
+    "level": 0.1
+   },
+   "thump": {
+    "files": [
+     "typography-terms/thump-*.mp3"
+    ],
+    "level": 0.18
+   },
+   "tick": {
+    "files": [
+     "typography-terms/tick-*.mp3"
+    ],
+    "level": 0.1,
+    "max": 0.32
+   },
+   "sticker": {
+    "files": [
+     "typography-terms/sticker-*.mp3"
+    ],
+    "level": 0.1,
+    "max": 0.7
+   }
+  }
  }
 }

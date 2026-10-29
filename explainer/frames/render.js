@@ -7,6 +7,8 @@
 //   node explainer/frames/render.js motion/<group>/<piece> 3.2 9 ...       stills -> out/still-<t>.png
 //   AUDIO_ONLY=1 node explainer/frames/render.js motion/<group>/<piece>    remix the sound onto out/<name>.mp4
 // Only the delivery files are made: one for Instagram, one for LinkedIn (--landscape); no master (owner 2026-10-24).
+// One page per platform when the themes differ (Instagram field, LinkedIn card): page-instagram.html for the vertical
+// render and page-linkedin.html for --landscape, each falling back to page.html.
 // Re-renders draw only what changed: 2 s chunks are cached by the hash of their drawn frames (render/workers.js).
 // Modules: render/capture.js (Chrome, frames), render/encode.js (ffmpeg), render/workers.js (parallel + cache),
 // render/progress.js (out/render-progress.json). Each worker prints a per-stage profile when it finishes.
@@ -27,6 +29,8 @@ const cfg = { landscape, dsf: draft ? 1 : +((args.find((a) => a.startsWith('--sc
 // 4 Chromes by default: measured 9.2 frames/s at 2x vs 6.7 with 2 and 10.4 with 6 (CPU-bound past 4); memory stays
 // about 50% free on 16 GB now that no master is encoded (2026-10-24)
 const workers = Math.max(1, +(flag('--workers') || 4));
+cfg.page = [landscape ? 'page-linkedin.html' : 'page-instagram.html', 'page.html'].find((f) => fs.existsSync(path.join(dir, f)));
+process.env.PAGE = cfg.page;   // the mixer takes the sound palette from the page being rendered
 const stills = args.slice(1).filter((x, i, all) => !x.startsWith('--') && !['--workers', '--segment', '--chunks', '--cache', '--key'].includes(all[i - 1])).map(Number);
 
 // one worker: a frame range into a video-only segment; reports "F <done>" lines to the parent
@@ -87,7 +91,7 @@ async function chunks(spec, cacheDir, base) {
   // sound: the page's cues (pen strokes, taps, cuts) go to the mixer, which writes audio.wav
   fs.writeFileSync(path.join(dir, 'sfx.json'), JSON.stringify({ total, keys: cues.keys.map((k) => [k, 'key']), ticks: cues.ticks,
     pops: [], whooshes: [], misses: [], hits: [], chord: [end], thumps: [],
-    draws: cues.draws, taps: cues.taps, brushes: cues.brushes, moves: cues.moves, cuts: cues.cuts, zooms: cues.zooms, checks: cues.checks, bed: 'ambient', kit: 'recorded' }));
+    draws: cues.draws, taps: cues.taps, brushes: cues.brushes, moves: cues.moves, cuts: cues.cuts, zooms: cues.zooms, checks: cues.checks, named: cues.named || [], only: !!cues.only, bed: 'ambient', kit: 'recorded' }));
   execFileSync(path.join(root, '.venv/bin/python'), [path.join(root, 'explainer/mix.py'), dir], { stdio: 'inherit' });
   const out = path.join(dir, 'out', name + (landscape ? '-landscape' : '') + (draft ? '-draft' : '') + '.mp4'), audio = path.join(dir, 'audio.wav');
 

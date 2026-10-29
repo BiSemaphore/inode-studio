@@ -18,7 +18,7 @@
 //   <div class="stack" data-t0 data-t1 data-cap="9">     lines appear in turn; scrolls up once more than cap
 (function () {
   const TM = window.TIMINGS, NB = TM.length;
-  const END = TM[NB - 1].end + 0.35, TOTAL = END + (window.END_HOLD || 2.0);
+  const END = TM[NB - 1].end + (window.TAIL || 0.35), TOTAL = END + (window.END_HOLD || 2.0);   // TAIL: hold on the last frame
   const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
   const clamp = (x) => Math.max(0, Math.min(1, x));
   function T(spec) {
@@ -32,6 +32,7 @@
     return w[1] + off;
   }
   const all = (sel) => [...document.querySelectorAll(sel)];
+  window.T = T;   // timing specs for page and theme scripts (kinetic.js)
 
   const frames = all('.frame').map((f, k) => {
     const a = f.dataset.from, z = f.dataset.to;
@@ -86,6 +87,10 @@
     moves: moves.map(({ at, dur }) => [at, dur]),
     zooms: window.ZOOMS || [], checks: window.CHECKS || [],
     cuts: frames.filter(({ k, t0 }) => k > 0 && t0 > 0.5 && t0 < 1e8).map(({ t0 }) => t0),
+    // named: data-sfx="name" on any element plays that theme sound at its data-sfx-at (else data-at or data-t0);
+    // window.SFX_ONLY = true makes these the only effects (no automatic taps, scratches, whooshes or end chord)
+    named: all('[data-sfx]').map((e) => [T(e.dataset.sfxAt || e.dataset.at || e.dataset.t0), e.dataset.sfx]).filter(([t]) => t < TOTAL),
+    only: !!window.SFX_ONLY,
   };
   window.TOTAL = TOTAL; window.END = END;
 
@@ -170,7 +175,11 @@
 
   window.renderFrame = (t) => {
     (window.ON_FRAME || []).forEach((fn) => fn(t));   // theme hooks (field: leaf light drift)
+    // subtitles change only on whole output frames: motion blur blends (2k-1)/60 and 2k/60 into frame k, and a line
+    // swapping between them would print half of both lines on top of each other
+    const tf = Math.ceil(t * 30 - 1e-6) / 30;
     subs.forEach(({ el, spans, ws, t0, t1, loop, cut, cutIn }) => {
+      const t = tf;
       el.style.opacity = (cutIn ? (t >= t0 ? 1 : 0) : clamp((t - t0) / 0.12)) * (cut ? (t < t1 ? 1 : 0) : 1 - clamp((t - t1) / 0.12));
       spans.forEach((s, i) => { s.style.opacity = i === 0 || t >= ws[i][1] - 0.04 ? 1 : 0; });   // never an empty bubble
       if (loop) { loop.path.style.strokeDashoffset = loop.L * (1 - ease(clamp((t - loop.at) / 0.45)));

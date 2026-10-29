@@ -1,0 +1,31 @@
+{
+ "name": "typography-terms",
+ "title": "Typography terms",
+ "status": "draft 2026-10-28 (owner asked for the first render; style frames: brand/references/studies/typography-terms-style.png)",
+ "extends": "base",
+ "use_for": "Personal and event stories told over the owner's own photos: editorial type in the quiet parts of the photo, words behind people (Vision cut-outs), handwritten asides, and a warm 'terms paper' for data frames.",
+ "load": {
+  "css": ["themes/base/base.css", "themes/typography-terms/typography-terms.css"],
+  "js_before_runtime": [],
+  "js_after_runtime": ["themes/typography-terms/typography-terms.js"]
+ },
+ "components": {
+  "photo": "<div class=\"photo [dark]\"><img class=\"push\" src=\"...\"><div class=\"grade\"></div></div>; cut-out on top: <img class=\"cut push\" src=\"...-cut.png\">",
+  "paper": "<div class=\"paper\"><div class=\"cols\"></div></div>",
+  "type": ".t-title (Inter Tight 900, <i> swaps to Fraunces italic), .t-serif, .t-hand, .t-line, .t-meta, .t-row (spread meta row with .bar), .t-time (with <sup>)",
+  "objects": ".pill (sticker), .chat (message bubble), .block (accent block behind a title), svg.draw with .hand-ink paths",
+  "sound": "data-sfx=\"shutter|paper|pen|sticker|thump|tick\" on the element; window.SFX_ONLY = true"
+ },
+ "study": "brand/references/studies/67-76-typography-terms.md",
+ "sound": {
+  "bed": "none",
+  "named": {
+   "shutter": {"files": ["typography-terms/shutter-*.mp3"], "level": 0.09},
+   "paper": {"files": ["typography-terms/paper-*.mp3"], "level": 0.08},
+   "pen": {"files": ["typography-terms/pen-*.mp3"], "level": 0.06},
+   "sticker": {"files": ["typography-terms/sticker-*.mp3"], "level": 0.06, "max": 0.7},
+   "thump": {"files": ["typography-terms/thump-*.mp3"], "level": 0.12},
+   "tick": {"files": ["typography-terms/tick-*.mp3"], "level": 0.07, "max": 0.32}
+  }
+ }
+}

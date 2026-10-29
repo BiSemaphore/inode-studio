@@ -1,7 +1,9 @@
 """Show every frames render in progress: percent, frames, time left, expected finish.
 
   .venv/bin/python tools/render_status.py           print once
-  .venv/bin/python tools/render_status.py --watch   live view, redraws every 2 s, stops when all are done
+  .venv/bin/python tools/render_status.py --watch   live view, redraws in place every 2 s (like top), stops when all are done
+
+A render whose progress file has not changed for 10 minutes is shown once, at the bottom, as stopped.
 """
 import json
 import pathlib
@@ -43,28 +45,56 @@ def line(d, age, bar_view=False):
     return f"{d['piece']}  {bar(d['pct'])} {d['pct']:3d}%  {d['frame']}/{d['frames']} frames{fps}{workers}\n  {tail}{stale}"
 
 
+STALE = 600
+
+
+def split(found):
+    live = [(d, a) for d, a in found if not (d["state"] == "rendering" and a > STALE)]
+    dead = [d for d, a in found if d["state"] == "rendering" and a > STALE]
+    return live, dead
+
+
 def main():
     if "--watch" not in sys.argv:
-        found = rows()
-        for d, age in found:
+        live, dead = split(rows())
+        for d, age in live:
             print(line(d, age))
-        if not found:
+        if not live:
             print("no render in progress")
+        if dead:
+            print("stopped: " + ", ".join(f"{d['piece']} ({d['pct']}%)" for d in dead))
         return
+    tty = sys.stdout.isatty()
+    if tty:
+        sys.stdout.write("\033[?1049h\033[?25l")   # alternate screen (like top), hide the cursor
+    last = None
     try:
         while True:
-            found = rows()
-            sys.stdout.write("\033[2J\033[H")   # clear the terminal, cursor home
-            print(time.strftime("%H:%M:%S"), " renders (Ctrl-C to stop)\n")
-            for d, age in found:
-                print(line(d, age, bar_view=True) + "\n")
-            if not found:
-                print("no render in progress")
-            if not any(d["state"] in ("rendering", "encoding", "joining") for d, _ in found):
+            live, dead = split(rows())
+            body = [time.strftime("%H:%M:%S") + "  renders (Ctrl-C to stop)", ""]
+            for d, age in live:
+                body += line(d, age, bar_view=True).split("\n") + [""]
+            if not live:
+                body.append("no render in progress")
+            if dead:
+                body.append("stopped: " + ", ".join(f"{d['piece']} ({d['pct']}%)" for d in dead))
+            if tty:   # redraw in place: cursor home, each line cleared to its end, then clear below
+                sys.stdout.write("\033[H" + "".join(l + "\033[K\n" for l in body) + "\033[J")
+                sys.stdout.flush()
+            elif body[1:] != last:   # piped (not a terminal): print only when something changed
+                print("\n".join(body), flush=True)
+                last = body[1:]
+            if not any(d["state"] in ("rendering", "encoding", "joining") for d, _ in live):
                 break
             time.sleep(2)
     except KeyboardInterrupt:
         pass
+    finally:
+        if tty:
+            sys.stdout.write("\033[?25h\033[?1049l")   # back to the normal screen, cursor visible
+            live, dead = split(rows())
+            for d, age in live:
+                print(line(d, age))
 
 
 if __name__ == "__main__":

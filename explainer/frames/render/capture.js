@@ -21,7 +21,7 @@ async function openPage(dir, cfg) {
   page.on('pageerror', (e) => { console.error('page error:', e.message); process.exit(1); });
   await page.setViewport(cfg.landscape ? { width: 1920, height: 1080, deviceScaleFactor: cfg.dsf } : { width: 1080, height: 1920, deviceScaleFactor: cfg.dsf });
   await page.evaluateOnNewDocument((t) => { window.TIMINGS = t; }, timings.beats || timings);
-  await page.goto('file://' + path.join(dir, 'page.html'), { waitUntil: 'networkidle0' });
+  await page.goto('file://' + path.join(dir, cfg.page || 'page.html'), { waitUntil: 'networkidle0' });
   await page.evaluate(() => document.fonts.ready);
   await page.evaluate(() => window.MEASURE && window.MEASURE());   // circles need the real font metrics
   const settle = () => page.evaluate((mode) => new Promise((r) => mode === 'none' ? r() : mode === 'raf' ? requestAnimationFrame(() => r())

@@ -17,6 +17,7 @@ bar length and the style (warm, bright, pulse) from the theme.
 """
 
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -158,12 +159,12 @@ DEFAULT_PALETTE = {"taps": ["kenney/interface-sounds/drop_00*.ogg"], "draws": ["
 
 
 def palette_of(piece):
-    """The theme's sound palette: meta.json "theme", else the last theme stylesheet page.html loads."""
+    """The theme's sound palette: the theme of the page being rendered (PAGE, set by render.js: Instagram and LinkedIn
+    may use different themes), else meta.json "theme", else the last theme stylesheet page.html loads."""
+    page = piece / os.environ.get("PAGE", "page.html")
+    found = re.findall(r"themes/([a-z-]+)/\1\.css", page.read_text()) if page.exists() else []
     meta = piece / "meta.json"
-    name = json.loads(meta.read_text()).get("theme") if meta.exists() else None
-    if not name and (piece / "page.html").exists():
-        found = re.findall(r"themes/([a-z]+)/\1\.css", (piece / "page.html").read_text())
-        name = found[-1] if found else None
+    name = found[-1] if found else (json.loads(meta.read_text()).get("theme") if meta.exists() else None)
     tj = pathlib.Path(__file__).resolve().parent / "frames" / "themes" / str(name) / "theme.json"
     return name, (json.loads(tj.read_text()).get("sound") if tj.exists() else None) or DEFAULT_PALETTE
 
@@ -198,6 +199,36 @@ def kit_effects(e, sfx, pal):
         sound.place(sfx, sound.whoosh(0.8), t - 0.05, 0.018, 0)
         if pal.get("lands"):   # card theme: the next card lands on the table
             sound.place(sfx, pick_any(pal["lands"]), t + 0.4, 0.05, rng.uniform(-0.1, 0.1))
+
+
+def named_effects(e, sfx, pal):
+    """Explicit cues from the page (data-sfx): each name maps to files, a level and an optional length in the theme
+    palette's "named" table, so every sound means the thing it plays under (a shutter for a photo, paper for paper)."""
+    for t, name in e.get("named", []):
+        spec = pal.get("named", {}).get(name)
+        x = pick_any(spec["files"]) if spec else None
+        if x is None:
+            continue
+        if spec.get("max"):
+            x = x[: int(spec["max"] * SR)].copy()
+            f = min(len(x) // 3, int(0.03 * SR))
+            if f:
+                x[-f:] *= np.linspace(1, 0, f)
+        sound.place(sfx, x, t + spec.get("offset", 0), spec.get("level", 0.06), rng.uniform(-0.15, 0.15))
+
+
+def theme_music(pal, total):
+    """The theme's chosen track (palette "music": a glob under assets/sfx, "music_start" seconds in), faded; or None."""
+    if not pal.get("music"):
+        return None
+    files = sorted(LIB.glob(pal["music"]))
+    if not files:
+        return None
+    x = sample(files[0])[int(pal.get("music_start", 0) * SR):]
+    n = int(total * SR)
+    x = np.tile(x, n // len(x) + 1)[:n]
+    tt = np.arange(n) / SR
+    return x * np.minimum(1, tt / 1.5) * np.clip((total - tt) / 2.5, 0, 1)
 
 
 def music_bed(total):
@@ -237,40 +268,44 @@ def main(piece):
     n = int(total * SR)
     sfx = np.zeros((2, n))
 
-    for t, kind in e["keys"]:
-        # Quiet: clicks about 28 dB under the voice (measured from the stems).
-        sound.place(sfx, sound.key_sound(kind), t, 0.055 if kind == "enter" else 0.045, rng.uniform(-0.1, 0.1))
-    for t in e.get("clicks", []):
-        # Mouse clicks for screen-recorded pieces; a touch above the keys so a UI click reads.
-        sound.place(sfx, sound.mouse_sound(), t - 0.01, 0.07, rng.uniform(-0.1, 0.1))
-    for t in e["ticks"]:
-        sound.place(sfx, sound.beeps([(1568, 0.02)]), t, 0.012)
-    for t in e["pops"]:
-        sound.place(sfx, pop(), t, 0.06, rng.uniform(-0.2, 0.2))
-    for t, mag in e["whooshes"]:
-        sound.place(sfx, sound.whoosh(mag), t, 0.03, 0)
-    for t in e["misses"]:
-        sound.place(sfx, sound.beeps([(523, 0.09), (392, 0.22)], 0.04), t, 0.06)
-    for t in e["hits"]:
-        sound.place(sfx, sound.beeps([(1175, 0.05), (1568, 0.08)]), t, 0.045)
-    for t in e.get("thumps", []):
-        sound.place(sfx, sound.thump(), t, 0.22)
-    if e.get("kit") == "recorded":
-        kit_effects(e, sfx, pal)
+    if e.get("only"):   # the page names every sound (typography-terms): nothing automatic
+        named_effects(e, sfx, pal)
     else:
-        for t, d in e.get("draws", []):
-            sound.place(sfx, pen(d), t, 0.022, rng.uniform(-0.15, 0.15))
-        for t in e.get("taps", []):
-            sound.place(sfx, tap(), t, 0.05, rng.uniform(-0.2, 0.2))
-        for t in e.get("brushes", []):
-            sound.place(sfx, swish(), t - 0.03, 0.07, 0)
-        for t, d in e.get("moves", []):
-            sound.place(sfx, sound.whoosh(0.4 + 0.3 * min(d, 1.0)), t, 0.02, 0)
-        for t in e.get("cuts", []):
-            sound.place(sfx, sound.whoosh(0.8), t - 0.05, 0.018, 0)
-    for t in e["chord"]:
-        for d, m in enumerate((65, 69, 72, 76)):
-            sound.place(sfx, sound.bell(sound.NOTE(m), 2.4), t + d * 0.09, 0.05, (d - 1.5) * 0.15)
+        for t, kind in e["keys"]:
+            # Quiet: clicks about 28 dB under the voice (measured from the stems).
+            sound.place(sfx, sound.key_sound(kind), t, 0.055 if kind == "enter" else 0.045, rng.uniform(-0.1, 0.1))
+        for t in e.get("clicks", []):
+            # Mouse clicks for screen-recorded pieces; a touch above the keys so a UI click reads.
+            sound.place(sfx, sound.mouse_sound(), t - 0.01, 0.07, rng.uniform(-0.1, 0.1))
+        for t in e["ticks"]:
+            sound.place(sfx, sound.beeps([(1568, 0.02)]), t, 0.012)
+        for t in e["pops"]:
+            sound.place(sfx, pop(), t, 0.06, rng.uniform(-0.2, 0.2))
+        for t, mag in e["whooshes"]:
+            sound.place(sfx, sound.whoosh(mag), t, 0.03, 0)
+        for t in e["misses"]:
+            sound.place(sfx, sound.beeps([(523, 0.09), (392, 0.22)], 0.04), t, 0.06)
+        for t in e["hits"]:
+            sound.place(sfx, sound.beeps([(1175, 0.05), (1568, 0.08)]), t, 0.045)
+        for t in e.get("thumps", []):
+            sound.place(sfx, sound.thump(), t, 0.22)
+        if e.get("kit") == "recorded":
+            kit_effects(e, sfx, pal)
+        else:
+            for t, d in e.get("draws", []):
+                sound.place(sfx, pen(d), t, 0.022, rng.uniform(-0.15, 0.15))
+            for t in e.get("taps", []):
+                sound.place(sfx, tap(), t, 0.05, rng.uniform(-0.2, 0.2))
+            for t in e.get("brushes", []):
+                sound.place(sfx, swish(), t - 0.03, 0.07, 0)
+            for t, d in e.get("moves", []):
+                sound.place(sfx, sound.whoosh(0.4 + 0.3 * min(d, 1.0)), t, 0.02, 0)
+            for t in e.get("cuts", []):
+                sound.place(sfx, sound.whoosh(0.8), t - 0.05, 0.018, 0)
+        for t in e["chord"]:
+            for d, m in enumerate((65, 69, 72, 76)):
+                sound.place(sfx, sound.bell(sound.NOTE(m), 2.4), t + d * 0.09, 0.05, (d - 1.5) * 0.15)
+        named_effects(e, sfx, pal)
 
     voice = load_voice(piece / "voice" / "voice.wav")[:n]
     vbuf = np.zeros(n)
@@ -281,9 +316,14 @@ def main(piece):
     if e.get("bed") == "ambient":
         # about 20 dB under the voice while she speaks, about 14 dB in the gaps
         vr = np.sqrt(np.mean(vbuf[np.abs(vbuf) > 0.01] ** 2)) * 1.6
-        bed = music_bed(total) if e.get("kit") == "recorded" else None
-        bed = ambient(total, pal.get("bed", "warm"), seed) if bed is None else bed / (np.sqrt(np.mean(bed ** 2)) + 1e-9)
-        mus = bed * vr * 10 ** (-14 / 20) * (1 - 0.5 * env)
+        bed = theme_music(pal, total)
+        if bed is None and e.get("kit") == "recorded":
+            bed = music_bed(total)
+        if bed is None and pal.get("bed") == "none":   # no track chosen yet and no synth bed wanted
+            mus = np.zeros(n)
+        else:
+            bed = ambient(total, pal.get("bed", "warm"), seed) if bed is None else bed / (np.sqrt(np.mean(bed ** 2)) + 1e-9)
+            mus = bed * vr * 10 ** (-14 / 20) * (1 - 0.5 * env)
     else:
         mus = sound.music(total) * 0.5 * (1 - 0.65 * env)
 

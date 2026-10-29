@@ -37,3 +37,6 @@ CLAUDE.md
 # Compressed old pieces stay local; only the index is tracked
 archive/*
 !archive/INDEX.md
+
+# Photos to doodle (personal, never committed): drop in doodle/inbox, results land in doodle/done
+/doodle/

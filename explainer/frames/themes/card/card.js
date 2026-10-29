@@ -11,6 +11,7 @@
 // Icons in the same line: data-doodle="pin" (tip at the point), "idea" (bulb), "choice" (signpost).
 // <body data-page="green">: the same cards on the green paper surface (card.css, tools/make_surface.py).
 // Cards: each .frame's .stage lands from the right when the frame starts and swipes off to the left when it ends.
+// window.DEAL = 'up' (split layouts, card beside page content): the card rises from below and leaves upward instead.
 (function () {
   const INK = '#111111';
   const P = (d, c = '') => `<path class="d ${c}" d="${d}"/>`;
@@ -85,7 +86,8 @@
   (window.ON_FRAME = window.ON_FRAME || []).push((t) => {
     decks.forEach(({ st, t0, t1, k }) => {
       const pin = k === 0 ? 1 : ease(clamp((t - t0) / 0.55)), out = ease(clamp((t - t1) / 0.3));
-      st.style.translate = `${(1 - pin) * 1150 - out * 1250}px ${(1 - pin) * 40}px`;
+      st.style.translate = window.DEAL === 'up'   // split layouts: the card rises in and leaves upward, never crossing the side
+        ? `0px ${(1 - pin) * 1150 - out * 1250}px` : `${(1 - pin) * 1150 - out * 1250}px ${(1 - pin) * 40}px`;
       st.style.rotate = `${(1 - pin) * 6 - out * 8}deg`;
     });
   });
