@@ -1,0 +1,81 @@
+{
+  "model": "qwen2.5-coder:7b",
+  "runs": 10,
+  "tokenizer": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "sampling": "model default",
+  "splits": {
+    "strawberry": {
+      "ids": [
+        495,
+        672,
+        15357
+      ],
+      "pieces": [
+        "str",
+        "aw",
+        "berry"
+      ]
+    },
+    "the": {
+      "ids": [
+        1782
+      ],
+      "pieces": [
+        "the"
+      ]
+    },
+    "understanding": {
+      "ids": [
+        7995,
+        10070
+      ],
+      "pieces": [
+        "under",
+        "standing"
+      ]
+    },
+    "tokenization": {
+      "ids": [
+        5839,
+        2022
+      ],
+      "pieces": [
+        "token",
+        "ization"
+      ]
+    },
+    "lollapalooza": {
+      "ids": [
+        75,
+        965,
+        391,
+        278,
+        2624,
+        4360
+      ],
+      "pieces": [
+        "l",
+        "oll",
+        "ap",
+        "al",
+        "oo",
+        "za"
+      ]
+    }
+  },
+  "question": "How many times does the letter r appear in the word strawberry? Answer with just the number.",
+  "correct": 3,
+  "answers": [
+    3,
+    3,
+    3,
+    3,
+    2,
+    3,
+    2,
+    2,
+    2,
+    3
+  ],
+  "times_right": 6
+}

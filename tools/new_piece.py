@@ -1,6 +1,6 @@
 """Start a new video from a theme (list them with tools/themes.py; ask the owner which one).
 
-  .venv/bin/python tools/new_piece.py shorts/attention-01 --theme card --title "How each word looks at every word"
+  .venv/bin/python tools/new_piece.py math-behind-llms/04-softmax --theme red-type --title "Why creative mode makes things up"
 
 Creates motion/<group>/<slug>/ with page.html (the theme's template), beats.json (one placeholder beat),
 meta.json (draft, both shapes: Instagram 1080x1920 and LinkedIn 1920x1080) and run/ for a local measurement.
@@ -16,7 +16,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 THEMES = ROOT / "explainer/frames/themes"
 
 ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-ap.add_argument("piece", help="<group>/<slug>, for example shorts/attention-01")
+ap.add_argument("piece", help="<group>/<slug>, for example math-behind-llms/04-softmax")
 ap.add_argument("--theme", required=True, help="a folder in explainer/frames/themes with a template")
 ap.add_argument("--title", default="")
 a = ap.parse_args()

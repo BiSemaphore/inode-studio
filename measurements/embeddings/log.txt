@@ -1,0 +1,45 @@
+{
+ "model": "nomic-embed-text",
+ "prefix": "clustering: ",
+ "dims": 768,
+ "first_numbers": {
+  "king": [
+   0.002,
+   0.069,
+   -0.208,
+   -0.004
+  ],
+  "queen": [
+   0.032,
+   0.047,
+   -0.224,
+   -0.025
+  ]
+ },
+ "pairs": {
+  "king-queen": {
+   "cosine": 0.859,
+   "angle_deg": 30.8
+  },
+  "king-banana": {
+   "cosine": 0.713,
+   "angle_deg": 44.5
+  },
+  "queen-banana": {
+   "cosine": 0.737,
+   "angle_deg": 42.5
+  },
+  "man-woman": {
+   "cosine": 0.889,
+   "angle_deg": 27.3
+  },
+  "banana-apple": {
+   "cosine": 0.728,
+   "angle_deg": 43.3
+  },
+  "king-apple": {
+   "cosine": 0.668,
+   "angle_deg": 48.1
+  }
+ }
+}

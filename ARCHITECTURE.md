@@ -32,7 +32,8 @@ post                videos/POSTING.md                   the queue (generated): w
 | `explainer/voice.py`, `explainer/mix.py` | narration and sound |
 | `explainer/*` (build.py, kit.js, scenes.py, ...) | the older whiteboard kit, used only by the first inode episodes |
 | `tools/` | small single-purpose scripts (themes, new piece, verify, check, publish, status, surface/leaf bakers) |
-| `motion/<group>/<slug>/` | a video's sources (not in git): beats, page, voice, run, out |
+| `motion/<topic>/<NN-part>/` | a video's sources (not in git): beats, page, voice, run, out; named like `videos/`, deleted once published |
+| `measurements/<topic>/` | the local measurement scripts and results our on-screen numbers come from (kept after the source is deleted) |
 | `videos/<topic>/[<part>/]<version>/` | finished files to post (not in git): instagram.mp4, linkedin.mp4, both covers, caption.txt; `videos/POSTING.md` is the generated queue |
 | `archive/` | compressed old or replaced pieces; `archive/INDEX.md` says what each is and how to restore it |
 | `brand/references/` | the owner's references and study cards (`studies/`) |
