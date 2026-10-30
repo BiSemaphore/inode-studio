@@ -1,0 +1,27 @@
+/* Theme "red-grain" (draft 2026-10-29; refs 62 surface, 18 type, 86-88 edits; studies/red-grain-style.png).
+   Flat red with sparse dark specks (tools/make_grain.py), cream type: a small bold setup line over one huge, tight,
+   lowercase punch with a full stop, lots of air, a tiny figure for scale; one cream thread line; photos as red and cream
+   stipple; subtitles plain cream with one italic keyword and the next words waiting faintly. Extends base. */
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800;900&family=Fraunces:ital,opsz,wght@1,9..144,400&display=swap');
+:root { --red: #AB3D3C; --cream: #F9EDD7; }
+html, body { background: var(--red); }
+body { background: var(--red) url('surface.png') 0 0 / 1080px 1920px; }
+@media (orientation: landscape) { body { background-image: url('surface-wide.png'); background-size: 1920px 1080px; } }
+.frame { color: var(--cream); }
+.setup { position: absolute; left: 0; right: 0; text-align: center; font: 700 46px/1.1 'Inter Tight', sans-serif; letter-spacing: -.02em; white-space: nowrap; }
+.punch { position: absolute; left: 0; right: 0; text-align: center; font: 900 220px/0.86 'Inter Tight', sans-serif; letter-spacing: -.065em; white-space: nowrap; }
+.meta { position: absolute; left: 0; right: 0; text-align: center; font: 600 26px/1 'Inter Tight', sans-serif; letter-spacing: .06em; opacity: .85; white-space: nowrap; }
+svg.l { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; }
+.thread { fill: none; stroke: var(--cream); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.fig { fill: none; stroke: var(--cream); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.patch { fill: var(--cream); }
+.print { position: absolute; background: var(--cream); padding: 12px 12px 40px; box-shadow: 0 24px 50px rgba(60,10,10,.35); }
+.print img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.print .cap { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font: 600 20px/1 'Inter Tight', sans-serif; letter-spacing: .12em; color: var(--red); }
+/* subtitles: plain cream text, no backing (owner 2026-10-29); one italic keyword per line */
+.sub-bubble { left: 90px; right: 90px; bottom: 360px; background: none; }
+.sub-text { font: 600 40px/1.35 'Inter Tight', sans-serif; letter-spacing: -.01em; color: var(--cream); text-shadow: none; }
+.sub-text span { background: none; }
+.sub-text .kw { font: italic 400 58px/1 'Fraunces', serif; }
+.sub-loop { display: none; }
+@media (orientation: landscape) { .sub-bubble { left: 300px; right: 300px; bottom: 60px; } .sub-text { font-size: 34px; } .sub-text .kw { font-size: 48px; } }

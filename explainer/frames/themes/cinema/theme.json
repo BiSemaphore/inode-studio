@@ -1,0 +1,73 @@
+{
+ "name": "cinema",
+ "title": "Cinema",
+ "status": "test 2026-10-29 (fast-cut kinetic typography)",
+ "extends": "base",
+ "load": {
+  "css": [
+   "themes/base/base.css",
+   "themes/cinema/cinema.css"
+  ],
+  "js_before_runtime": [],
+  "js_after_runtime": [
+   "fx.js"
+  ]
+ },
+ "sound": {
+  "bed": "none",
+  "music": "fast/beat-fast-cut-test.wav",
+  "named": {
+   "impact": {
+    "files": [
+     "fast/impact-1.mp3"
+    ],
+    "level": 0.2,
+    "max": 2.5
+   },
+   "hit": {
+    "files": [
+     "fast/impact-3.mp3"
+    ],
+    "level": 0.16,
+    "max": 1.8
+   },
+   "whoosh": {
+    "files": [
+     "fast/whoosh-1.mp3",
+     "fast/whoosh-3.mp3"
+    ],
+    "level": 0.14
+   },
+   "glitch": {
+    "files": [
+     "fast/glitch-1.mp3",
+     "fast/glitch-3.mp3"
+    ],
+    "level": 0.1,
+    "max": 0.35
+   },
+   "riser": {
+    "files": [
+     "fast/riser-2.mp3"
+    ],
+    "level": 0.12,
+    "tail": 1.6
+   },
+   "boom": {
+    "files": [
+     "fast/sub-1.mp3"
+    ],
+    "level": 0.2,
+    "max": 3.0
+   },
+   "heart": {
+    "files": [
+     "fast/sub-2.mp3"
+    ],
+    "level": 0.2
+   }
+  },
+  "music_db": -7,
+  "duck": 0.35
+ }
+}

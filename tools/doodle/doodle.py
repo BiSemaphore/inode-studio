@@ -2,7 +2,7 @@
 
   .venv/bin/python tools/doodle/doodle.py <photo> <plan.json> [--out out.png] [--html-only]
 
-The plan is {"elements": [...]} (optional "color", "accent", "stroke", "max_side", "palette").
+The plan is {"elements": [...]} (optional "color", "accent", "stroke", "max_side", "palette", "shadow").
 "palette": a name (crayon, pastel, mint, sunset, mono-white, mono-ink) or a list of colours; elements without their
 own "color" take the palette colours in turn. Positions are fractions of the
 photo (x of the width, y of the height); sizes are fractions of the width. Elements:
@@ -18,9 +18,10 @@ photo (x of the width, y of the height); sizes are fractions of the width. Eleme
   ground   {"x", "y", "w"}                           short strokes around the base of an object
   figure   {"pose": "sit|wave|peek", "x", "y", "size", "front"}   a monoline person; (x, y) = where it sits or stands
   wave     {"y", "amp", "notes"}                     a wavy staff line across the photo, optional music notes
+  svg      {"content"}                               raw SVG markup in photo pixels; class="ln" draws a hand line
 
 "behind": true puts text behind the subject (Vision subject mask, tools/subject_mask.swift, cached per photo).
-Fonts: hand, marker, script, serif, italic, bold, caps. Output defaults to <photo stem>-doodled.png next to the photo.
+Fonts: hand, marker, script, serif, italic, bold, caps, pen, doodle, scribble. Ornaments take "fill": true. Output defaults to <photo stem>-doodled.png next to the photo.
 """
 import argparse
 import hashlib
@@ -45,6 +46,9 @@ FONTS = {
     "serif": ("'DM Serif Display', serif", 400, "normal", "none"),
     "italic": ("'Fraunces', serif", 400, "italic", "none"),
     "bold": ("'Inter Tight', sans-serif", 900, "normal", "none"),
+    "pen": ("'Nanum Pen Script', cursive", 400, "normal", "none"),        # real pen handwriting (owner 2026-10-30)
+    "doodle": ("'Gloria Hallelujah', cursive", 400, "normal", "none"),
+    "scribble": ("'Reenie Beanie', cursive", 400, "normal", "none"),
 }
 PALETTES = {
     "crayon": ["#E8483B", "#2F6FD6", "#F2A93B", "#3FA34D", "#9B5DE5", "#F06BA8"],
@@ -55,7 +59,8 @@ PALETTES = {
     "mono-ink": ["#1B1A17"],
 }
 FONT_LINK = ("https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Gochi+Hand&family=Caveat:wght@700"
-             "&family=DM+Serif+Display&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter+Tight:wght@900&display=swap")
+             "&family=DM+Serif+Display&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter+Tight:wght@900"
+             "&family=Nanum+Pen+Script&family=Gloria+Hallelujah&family=Reenie+Beanie&display=swap")
 
 
 def load_photo(src, work, max_side):
@@ -184,6 +189,9 @@ ORNAMENTS = {   # unit box -1..1, drawn with the line style
     "leaves": "M -.2 .8 C -.9 .2 -.6 -.6 -.1 -.9 C 0 -.3 .1 .3 -.2 .8 Z M .35 .7 C .2 .1 .5 -.4 .95 -.45 C .9 .1 .7 .5 .35 .7 Z",
     "dots": "M -.8 0 L -.79 0 M 0 0 L .01 0 M .8 0 L .81 0",
 }
+NOTES = ("M -.55 .55 L -.55 -.75 L .65 -.95 L .65 .35 M -.55 -.45 L .65 -.65 "
+         "M -.87 .55 a .32 .22 -20 1 0 .64 0 a .32 .22 -20 1 0 -.64 0 M .33 .35 a .32 .22 -20 1 0 .64 0 a .32 .22 -20 1 0 -.64 0")
+
 
 
 def figure(pose):
@@ -206,6 +214,10 @@ def figure(pose):
 def build(plan, W, H, base_url, cut_url, mask, rnd):
     col, acc = plan.get("color", "#FFFFFF"), plan.get("accent", "#B9D86A")
     sw = plan.get("stroke", .006) * W
+    # "shadow": a soft drop shadow under every mark, as a fraction of the width (owner 2026-10-30), e.g. .004
+    sh = plan.get("shadow", 0) * W
+    drop = f"drop-shadow({sh * .5:.1f}px {sh:.1f}px {sh * .5:.1f}px rgba(0,0,0,.85))"   # firm, so it shows on dark grounds too
+    shadow_css = f" .layer{{filter:{drop}}} .tx{{filter:url(#wob) {drop}}}" if sh else ""
     behind, front = [], []
 
     def font_css(key, size, color, extra=""):
@@ -257,11 +269,13 @@ def build(plan, W, H, base_url, cut_url, mask, rnd):
             d = outline_path(mask, W, e.get("pad", .03), e.get("overshoot", True), rnd, e.get("region"), e.get("round", .6))
             dash = f' stroke-dasharray="{4 * sw:.1f} {3 * sw:.1f}"' if e.get("dashed") else ""
             out.append(f'<svg class="layer" viewBox="0 0 {W} {H}" style="color:{c}"><path class="ln" d="{d}"{dash}/></svg>')
+        elif t == "svg":   # raw SVG in photo pixels (viewBox 0 0 W H); class "ln" gives the hand line and wobble
+            out.append(f'<svg class="layer" viewBox="0 0 {W} {H}" style="color:{c}">{e["content"]}</svg>')
         elif t == "ornament":
             s = e.get("size", .025) * W
-            shape = ORNAMENTS[e["shape"]] if e["shape"] != "notes" else None
+            shape = ORNAMENTS[e["shape"]] if e["shape"] != "notes" else NOTES   # notes used to draw nothing ("None")
             g = (f'<g transform="translate({e["x"] * W:.1f} {e["y"] * H:.1f}) rotate({e.get("rotate", 0)}) scale({s:.2f})">'
-                 f'<path class="ln" style="stroke-width:{sw / s:.3f}" d="{shape}"/></g>')
+                 f'<path class="ln" style="stroke-width:{sw / s:.3f}{";fill:currentColor" if e.get("fill") else ""}" d="{shape}"/></g>')
             out.append(f'<svg class="layer" viewBox="0 0 {W} {H}" style="color:{c}">{g}</svg>')
         elif t in ("bubble", "capsule"):
             size = e.get("size", .045)
@@ -308,7 +322,7 @@ def build(plan, W, H, base_url, cut_url, mask, rnd):
     return f"""<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="{FONT_LINK}">
 <style>*{{margin:0;box-sizing:border-box}} html,body{{width:{W}px;height:{H}px;overflow:hidden;background:#000}}
 .full{{position:absolute;left:0;top:0;width:{W}px;height:{H}px}} .layer{{position:absolute;left:0;top:0;width:{W}px;height:{H}px;overflow:visible}}
-.tx{{position:absolute;white-space:nowrap;filter:url(#wob)}} .ln{{fill:none;stroke:currentColor;stroke-width:{sw:.2f};stroke-linecap:round;stroke-linejoin:round;filter:url(#wob)}}</style>
+.tx{{position:absolute;white-space:nowrap;filter:url(#wob)}} .ln{{fill:none;stroke:currentColor;stroke-width:{sw:.2f};stroke-linecap:round;stroke-linejoin:round;filter:url(#wob)}}{shadow_css}</style>
 </head><body><svg width="0" height="0" style="position:absolute"><filter id="wob"><feTurbulence type="fractalNoise" baseFrequency="{3 / W:.5f}" numOctaves="2" seed="4"/>
 <feDisplacementMap in="SourceGraphic" scale="{wob:.1f}"/></filter></svg>
 <img class="full" src="{base_url}">{''.join(behind)}{cut_html}{''.join(front)}</body></html>"""

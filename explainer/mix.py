@@ -209,6 +209,12 @@ def named_effects(e, sfx, pal):
         x = pick_any(spec["files"]) if spec else None
         if x is None:
             continue
+        if spec.get("tail"):   # use the END of the sound (a riser that peaks on the hit), placed so it ends at t
+            x = x[-int(spec["tail"] * SR):].copy()
+            f = min(len(x) // 3, int(0.08 * SR))
+            if f:
+                x[:f] *= np.linspace(0, 1, f)
+            t = t - spec["tail"]
         if spec.get("max"):
             x = x[: int(spec["max"] * SR)].copy()
             f = min(len(x) // 3, int(0.03 * SR))
@@ -323,7 +329,7 @@ def main(piece):
             mus = np.zeros(n)
         else:
             bed = ambient(total, pal.get("bed", "warm"), seed) if bed is None else bed / (np.sqrt(np.mean(bed ** 2)) + 1e-9)
-            mus = bed * vr * 10 ** (-14 / 20) * (1 - 0.5 * env)
+            mus = bed * vr * 10 ** (pal.get("music_db", -14) / 20) * (1 - pal.get("duck", 0.5) * env)   # a beat edit sits louder
     else:
         mus = sound.music(total) * 0.5 * (1 - 0.65 * env)
 

@@ -1,0 +1,75 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>04-agent-protocol</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,300;1,9..144,400&family=Inter+Tight:wght@500;600;700;800&family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@500&display=swap"><style>
+* { box-sizing: border-box; margin: 0; }
+body { background: #222; }
+.s { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); color: var(--ink); }
+.grain { position: absolute; inset: 0; opacity: var(--grain, .12); mix-blend-mode: overlay; pointer-events: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.tag { position: absolute; left: 72px; top: 66px; font: 600 24px/1 var(--ui); letter-spacing: .16em; text-transform: uppercase; }
+.num { position: absolute; right: 72px; top: 66px; font: 500 24px/1 'JetBrains Mono', monospace; opacity: .7; }
+.top { position: absolute; left: 72px; right: 72px; top: 150px; }
+h1 { font: var(--h1); letter-spacing: var(--h1ls, -.04em); }
+h1 i { font: italic 400 1.03em/1 Fraunces, serif; letter-spacing: -.02em; }
+.lede { margin-top: 28px; font: var(--lede); max-width: 920px; }
+.foot { position: absolute; left: 72px; right: 72px; bottom: 58px; display: flex; justify-content: space-between; align-items: end; gap: 40px;
+  font: 500 20px/1.3 'JetBrains Mono', monospace; opacity: .8; }
+.foot b { font: 800 25px/1 'Bricolage Grotesque', sans-serif; letter-spacing: -.02em; white-space: nowrap; }
+.x { position: absolute; }
+svg.v { position: absolute; left: 0; top: 0; width: 1080px; height: 1350px; overflow: visible; }
+.th { fill: none; stroke: var(--ink); stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+.tn { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.big { font: 800 150px/.95 'Bricolage Grotesque', sans-serif; letter-spacing: -.05em; }
+.mono { font: 500 36px/1.45 'JetBrains Mono', monospace; }
+.lab { font: 600 25px/1.2 var(--ui); letter-spacing: .12em; text-transform: uppercase; }
+.it { font: italic 400 44px/1.15 Fraunces, serif; }
+.swipe { position: absolute; right: 72px; bottom: 116px; font: italic 400 36px/1 Fraunces, serif; }
+.row { position: absolute; left: 72px; right: 72px; display: flex; justify-content: space-between; align-items: baseline;
+  border-top: 3px solid var(--ink); padding-top: 18px; }
+.row .k { font: 600 26px/1.2 var(--ui); letter-spacing: .1em; text-transform: uppercase; }
+.row .vv { font: 800 64px/1 'Bricolage Grotesque', sans-serif; letter-spacing: -.03em; }
+.t-red { --bg: #AB3D3C url('file:///Users/shahidraza/workspace/inode-studio/explainer/frames/themes/red-grain/surface.png') 0 -285px / 1080px 1920px; --ink: #F6EEDC; --ui: 'Inter Tight', sans-serif;
+      --h1: 800 112px/.9 'Bricolage Grotesque', sans-serif; --lede: italic 400 44px/1.2 Fraunces, serif; --grain: 0; }
+      .t-red .chip { position:absolute; padding:16px 28px 20px; background:#F6EEDC; color:#8E2A29; border-radius:14px; font:800 60px/1 'Bricolage Grotesque',sans-serif; letter-spacing:-.03em; }.t-blue { --bg: #0C4297; --ink: #FFFFFF; --ui: 'Space Grotesk', sans-serif; --h1: 700 100px/.95 'Space Grotesk', sans-serif;
+      --h1ls: -.035em; --lede: 400 36px/1.35 'JetBrains Mono', monospace; --grain: .1; }
+      .t-blue::before { content:''; position:absolute; inset:40px; border:2px solid rgba(255,255,255,.55);
+        background-image: linear-gradient(rgba(255,255,255,.13) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.13) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.28) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,.28) 2px, transparent 2px);
+        background-size: 40px 40px, 40px 40px, 200px 200px, 200px 200px; }
+      .t-blue h1 i { font: 300 1em/1 'Space Grotesk', sans-serif; font-style: normal; text-decoration: underline 4px; text-underline-offset: 10px; }
+      .t-blue .box { position:absolute; border:3px solid #fff; padding:22px 26px; background:#0C4297; }.t-green { --bg: #0C462C url('file:///Users/shahidraza/workspace/inode-studio/explainer/frames/themes/card/surface-green.png') 0 -285px / 1080px 1920px; --ink: #F2ECDE; --ui: 'Inter Tight', sans-serif;
+      --h1: 400 112px/.98 Fraunces, serif; --h1ls: -.03em; --lede: 500 38px/1.3 'Inter Tight', sans-serif; --grain: .08; }
+      .t-green h1 i { font: italic 300 1em/1 Fraunces, serif; color: #F8EB44; }.t-chat { --bg: #3D52A8; --ink: #FFFFFF; --ui: 'Inter Tight', sans-serif; --h1: 800 96px/.98 'Inter Tight', sans-serif;
+      --h1ls: -.045em; --lede: 500 36px/1.3 'Inter Tight', sans-serif; --grain: .08; }
+      .bub { position:absolute; max-width:760px; padding:26px 34px; border-radius:40px; font:600 38px/1.25 'Inter Tight',sans-serif; letter-spacing:-.01em; }
+      .bub.l { background:#fff; color:#1D2A66; border-bottom-left-radius:10px; left:72px; }
+      .bub.r { background:#A9C1FF; color:#14204F; border-bottom-right-radius:10px; right:72px; }
+      .who { position:absolute; font:600 22px/1 'Inter Tight',sans-serif; letter-spacing:.14em; text-transform:uppercase; opacity:.75; }.t-cal { --bg: #F3EDDC; --ink: #002A8E; --ui: 'Inter Tight', sans-serif; --h1: 800 92px/.95 'Inter Tight', sans-serif;
+      --h1ls: -.04em; --lede: italic 400 40px/1.25 Fraunces, serif; --grain: .1; }
+      .t-cal .rings { position:absolute; left:28px; right:28px; top:0; height:100px; display:flex; justify-content:space-between; }
+      .t-cal .rings i { width:14px; height:84px; border-radius:7px; background:#002A8E; }
+      .t-cal .tag { top: 120px; } .t-cal .num { top: 120px; } .t-cal .top { top: 190px; }
+      .wk { position:absolute; left:72px; right:72px; top:600px; height:560px; display:grid; grid-template-columns:repeat(7,1fr); border-top:3px solid #002A8E; }
+      .wk div { border-right:3px solid #002A8E; position:relative; padding:12px 10px; font:600 30px/1 'Inter Tight',sans-serif; }
+      .wk div:last-child { border-right:0; } .wk .on { background:#002A8E; color:#F3EDDC; }
+      .wk small { display:block; font:600 18px/1 'Inter Tight',sans-serif; letter-spacing:.12em; margin-bottom:10px; opacity:.7; }
+      .stk { position:absolute; padding:18px 24px; border:4px solid #002A8E; border-radius:20px; font:700 34px/1.1 'Inter Tight',sans-serif;
+        box-shadow: 0 8px 16px rgba(0,20,70,.25); letter-spacing:-.01em; }.t-cobalt { --bg: #002A8E; --ink: #F3EDDC; --ui: 'Inter Tight', sans-serif; --h1: 800 104px/.92 'Bricolage Grotesque', sans-serif;
+      --lede: italic 400 42px/1.22 Fraunces, serif; --grain: .14; }
+      .t-cobalt .blk { display:inline-block; background:#F3EDDC; color:#002A8E; padding:0 .14em .04em; rotate:-2.5deg; border-radius:6px; }.t-paper { --bg: #EFEBE3; --ink: #141414; --ui: 'Inter Tight', sans-serif; --h1: 500 104px/.98 Fraunces, serif; --h1ls: -.035em;
+      --lede: 500 36px/1.32 'Inter Tight', sans-serif; --grain: .1; }
+      .t-paper h1 i { color: #C8372D; }
+      .t-paper .red { color: #C8372D; }.t-yellow { --bg: #F4D23C; --ink: #002A8E; --ui: 'Inter Tight', sans-serif; --h1: 800 92px/.95 'Bricolage Grotesque', sans-serif;
+      --lede: italic 400 40px/1.22 Fraunces, serif; --grain: .12; }
+      .giant { position:absolute; font:800 520px/.8 'Bricolage Grotesque',sans-serif; letter-spacing:-.07em; color:#002A8E; opacity:.95; white-space:nowrap; }.t-news { --bg: #F1EDE4; --ink: #111111; --ui: 'Inter Tight', sans-serif; --h1: 700 100px/.95 Fraunces, serif; --h1ls: -.03em;
+      --lede: 400 34px/1.35 Fraunces, serif; --grain: .16; }
+      .t-news .mast { position:absolute; left:72px; right:72px; top:100px; border-top:6px solid #111; border-bottom:2px solid #111; padding:8px 0;
+        display:flex; justify-content:space-between; font:600 20px/1 'Inter Tight',sans-serif; letter-spacing:.14em; text-transform:uppercase; }
+      .t-news .top { top: 170px; }
+      .t-news .cols { position:absolute; left:72px; right:72px; top:700px; columns:2; column-gap:44px; column-rule:2px solid #111;
+        font:400 31px/1.42 Fraunces, serif; }.t-dark { --bg: #121212; --ink: #F2F0EB; --ui: 'Space Grotesk', sans-serif; --h1: 700 100px/.95 'Space Grotesk', sans-serif; --h1ls: -.04em;
+      --lede: 400 36px/1.35 'Space Grotesk', sans-serif; --grain: .22; }
+      .t-dark h1 i { font: 700 1em/1 'Space Grotesk', sans-serif; font-style: normal; color: #F4D23C; }
+      .t-dark .y { color: #F4D23C; }</style></head><body><section class="s t-chat"><div class="tag">Sierra + Meta &middot; Oct 6</div><div class="num">01 / 06</div><div class="top"><h1>Your AI agent will <i>log in</i> for you.</h1><div class=lede>A new open standard, the Personal Agent Protocol.</div></div><div class="who" style="left:72px;top:690px">your agent</div><div class="bub l" style="top:730px">Hi, I'm shopping for Sam. Is this in stock?</div><div class="who" style="right:72px;top:900px">the store</div><div class="bub r" style="top:940px">Yes. Want to sign in to order?</div><div class=swipe>swipe &rarr;</div><div class="foot"><span>sierra.ai, Personal Agent Protocol</span><b>binary semaphore</b></div><div class="grain"></div></section>
+<section class="s t-chat"><div class="tag">Sierra + Meta &middot; Oct 6</div><div class="num">02 / 06</div><div class="top"><h1>It starts as a <i>guest.</i></h1><div class=lede>Enough to check stock or ask about returns.</div></div><div class="bub l" style="top:760px">What is your returns policy?</div><div class="bub r" style="top:930px">30 days. No sign-in needed.</div><div class="foot"><span>example chat; the protocol defines guest access</span><b>binary semaphore</b></div><div class="grain"></div></section>
+<section class="s t-chat"><div class="tag">Sierra + Meta &middot; Oct 6</div><div class="num">03 / 06</div><div class="top"><h1>You decide <i>the access.</i></h1><div class=lede>When a task needs your account, you sign in (OAuth) and choose:</div></div><div class="bub r" style="top:820px">read-only</div><div class="bub r" style="top:960px;right:330px">read and write</div><div class="foot"><span>sierra.ai, Personal Agent Protocol</span><b>binary semaphore</b></div><div class="grain"></div></section>
+<section class="s t-chat"><div class="tag">Sierra + Meta &middot; Oct 6</div><div class="num">04 / 06</div><div class="top"><h1>The business sets <i>the limits.</i></h1><div class=lede>It decides what agents may do on its site, its APIs (MCP, OpenAPI) or its own agent.</div></div><div class="bub l" style="top:800px">Change the delivery address, please.</div><div class="bub r" style="top:970px">Agents can see orders here, not edit them.</div><div class="foot"><span>example chat; limits are set by each business</span><b>binary semaphore</b></div><div class="grain"></div></section>
+<section class="s t-chat"><div class="tag">Sierra + Meta &middot; Oct 6</div><div class="num">05 / 06</div><div class="top"><h1>Who is <i>in?</i></h1></div><div class="bub l" style="top:640px">Walmart, Shopify, Stripe</div><div class="bub l" style="top:790px">Genesys, Instinct, Rocket</div><div class="bub r" style="top:960px">+35 design partners on the draft, incl. Visa, PayPal, OpenAI</div><div class="foot"><span>sierra.ai, Personal Agent Protocol</span><b>binary semaphore</b></div><div class="grain"></div></section>
+<section class="s t-chat"><div class="tag">Sierra + Meta &middot; Oct 6</div><div class="num">06 / 06</div><div class="top"><h1>Still a <i>draft.</i></h1><div class=lede>A 1.0 is in development. Payments are planned as an extension. Save this.</div></div><div class="bub l" style="top:800px">Can I pay for this?</div><div class="bub r" style="top:970px">Not yet. Payments come later.</div><div class="foot"><span>binarysemaphore.com</span><b>binary semaphore</b></div><div class="grain"></div></section></body></html>

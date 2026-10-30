@@ -1,0 +1,17 @@
+{
+ "name": "red-grain",
+ "title": "Red grain",
+ "status": "draft 2026-10-29 (samples: brand/references/studies/red-grain-style.png)",
+ "extends": "base",
+ "use_for": "Punchy explainers: red grain, get-up type, a thread line, stipple photos, keyword subtitles.",
+ "load": {"css": ["themes/base/base.css", "themes/red-grain/red-grain.css"], "js_before_runtime": [], "js_after_runtime": ["kinetic.js", "themes/red-grain/red-grain.js"]},
+ "sound": {
+  "bed": "warm",
+  "named": {
+   "pen": {"files": ["typography-terms/pen-*.mp3"], "level": 0.10},
+   "thump": {"files": ["typography-terms/thump-*.mp3"], "level": 0.18},
+   "tick": {"files": ["typography-terms/tick-*.mp3"], "level": 0.10, "max": 0.32},
+   "shutter": {"files": ["typography-terms/shutter-*.mp3"], "level": 0.14}
+  }
+ }
+}

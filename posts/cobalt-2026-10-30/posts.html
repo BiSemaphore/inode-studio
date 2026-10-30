@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>cobalt posts 2026-10-30</title>
+<!-- Instagram look from brand/references/studies/32-instagram-cobalt.md: cobalt #002A8E with cream, chunky hand
+     lettering, a thick-line figure, a script tagline, outlined pills, stickers. No photos.
+     1 tokens (ref 32 + 62): strawberry is 3 tokens to qwen2.5-coder's tokenizer (motion/shorts/tokens-01/run).
+     2 calendar (ref 74): Anthropic's October, anthropic.com/news (checked 2026-10-29).
+     3 curve (ref 10 + 77): the AI coding curve. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&family=Inter+Tight:wght@500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  :root { --co: #002A8E; --cr: #F3EDDC; --yel: #F4D23C; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #333; }
+  .post { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--co); color: var(--cr); }
+  .grain { position: absolute; inset: 0; opacity: .16; mix-blend-mode: overlay; pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .hand { position: absolute; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; letter-spacing: -.045em; line-height: .88; }
+  .it { font-family: Fraunces, serif; font-style: italic; font-weight: 400; letter-spacing: -.02em; }
+  .script { position: absolute; font: italic 400 46px/1.15 Fraunces, serif; letter-spacing: -.01em; }
+  .ui { position: absolute; font: 500 28px/1 'Inter Tight', sans-serif; }
+  .pill { position: absolute; padding: 18px 40px; border: 3px solid var(--cr); border-radius: 999px; font: 600 30px/1 'Inter Tight', sans-serif; }
+  svg.full { position: absolute; left: 0; top: 0; width: 1080px; height: 1350px; overflow: visible; }
+  .th { fill: none; stroke: var(--cr); stroke-width: 15; stroke-linecap: round; stroke-linejoin: round; }
+  .th.s { stroke-width: 9; }
+  /* 2 calendar page */
+  #p2 { background: var(--cr); color: var(--co); }
+  #p2 .rings { position: absolute; left: 30px; right: 30px; top: 0; height: 110px; display: flex; justify-content: space-between; }
+  #p2 .rings i { width: 16px; height: 96px; border-radius: 8px; background: var(--co); box-shadow: 4px 0 0 #6C7FB8; }
+  #p2 .cal { position: absolute; left: 0; right: 0; top: 330px; height: 1020px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 70px 1fr 1fr; }
+  #p2 .cal > div { border-right: 3px solid var(--co); border-top: 3px solid var(--co); position: relative; }
+  #p2 .cal > div:nth-child(3n) { border-right: 0; }
+  #p2 .dname { font: 600 28px/70px 'Inter Tight', sans-serif; letter-spacing: .12em; text-align: center; }
+  #p2 .dn { position: absolute; right: 22px; top: 18px; font: 500 40px/1 'Inter Tight', sans-serif; }
+  #p2 .big { background: var(--co); color: var(--cr); }
+  .sticker { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 8px 16px rgba(0,20,70,.28); }
+  /* 4 collage (ref 82) */
+  #p4 { background: var(--cr); }
+  #p4 .sc { position: absolute; overflow: hidden; color: #0E1A3A; }
+  #p4 .hl { background: linear-gradient(transparent 14%, var(--yel) 14%, var(--yel) 88%, transparent 88%); padding: 0 4px; }
+  /* 5 labelled laptop (ref 77) */
+  .lab5 { position: absolute; font: 600 26px/1.2 'Inter Tight', sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+  .lab5 b { display: block; font: italic 400 40px/1.05 Fraunces, serif; letter-spacing: -.01em; text-transform: none; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<!-- 1: ref 32 layout (big hand title, one thick-line drawing, script line, two tags) + ref 62 hand lettering.
+     The drawing is the fact: qwen2.5-coder's tokenizer cuts strawberry into str | aw | berry (ids 495, 672, 15357);
+     asked 10 times how many r's, it said 3 six times (motion/shorts/tokens-01/run/results.json). -->
+<section class="post" id="p1">
+  <div class="ui" style="left:70px;top:70px;letter-spacing:.14em">MATH BEHIND LLMS &middot; 1</div>
+  <div class="hand" style="left:70px;top:150px;font-size:150px;rotate:-2deg">how many<br><span class="it">r's</span> in it?</div>
+  <svg class="full" style="top:40px">
+    <defs>
+      <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="6"/></filter>
+      <path id="berry" d="M 450 520 C 300 500 250 680 320 830 C 370 935 430 1000 450 1015 C 470 1000 530 935 580 830 C 650 680 600 500 450 520 Z"/>
+      <clipPath id="b1"><rect x="200" y="400" width="500" height="250"/></clipPath>
+      <clipPath id="b2"><rect x="200" y="650" width="500" height="150"/></clipPath>
+      <clipPath id="b3"><rect x="200" y="800" width="500" height="300"/></clipPath>
+      <g id="seeds" class="th s" style="stroke-width:8"><path d="M 380 600 l 6 14 M 450 585 l 0 15 M 520 600 l -6 14 M 350 700 l 6 14 M 420 690 l 3 15 M 490 690 l -3 15 M 555 700 l -6 14 M 380 790 l 5 14 M 450 780 l 0 15 M 520 790 l -5 14 M 420 880 l 3 14 M 485 880 l -3 14 M 450 950 l 0 13"/></g>
+    </defs>
+    <g filter="url(#rough)">
+      <g transform="translate(-24 -36) rotate(-7 450 560)" clip-path="url(#b1)"><use href="#berry" class="th"/><use href="#seeds"/>
+        <path class="th" d="M 380 528 L 410 482 L 430 520 L 450 470 L 470 520 L 490 482 L 520 528 M 450 470 L 456 430"/></g>
+      <g clip-path="url(#b2)"><use href="#berry" class="th"/><use href="#seeds"/></g>
+      <g transform="translate(22 40) rotate(6 450 900)" clip-path="url(#b3)"><use href="#berry" class="th"/><use href="#seeds"/></g>
+      <path class="th s" d="M 270 650 L 640 650 M 270 800 L 640 800" stroke-dasharray="4 26" style="stroke-width:6;opacity:.7"/>
+    </g>
+  </svg>
+  <div class="hand" style="left:700px;top:580px;font-size:88px">str</div><div class="ui" style="left:704px;top:672px;font:500 26px/1 'JetBrains Mono',monospace;opacity:.75">495</div>
+  <div class="hand" style="left:700px;top:740px;font-size:88px">aw</div><div class="ui" style="left:704px;top:832px;font:500 26px/1 'JetBrains Mono',monospace;opacity:.75">672</div>
+  <div class="hand" style="left:700px;top:930px;font-size:88px">berry</div><div class="ui" style="left:704px;top:1022px;font:500 26px/1 'JetBrains Mono',monospace;opacity:.75">15357</div>
+  <div class="script" style="left:70px;top:1132px;rotate:-2deg">the AI sees 3 pieces, not 10 letters</div>
+  <svg class="full">
+    <g transform="translate(0 26) rotate(-4 300 1240)"><path class="th s" style="stroke-width:5" d="M 150 1205 C 250 1196 380 1198 452 1206 C 470 1222 470 1262 452 1276 C 360 1284 240 1282 150 1276 C 132 1262 132 1220 150 1205 Z"/>
+      <text x="300" y="1252" text-anchor="middle" style="font:italic 600 34px Fraunces,serif" fill="#F3EDDC">asked 10 times</text></g>
+    <g transform="translate(0 26) rotate(5 770 1236)"><path class="th s" style="stroke-width:5;fill:#F3EDDC" d="M 600 1200 C 700 1192 840 1194 930 1202 C 948 1218 948 1258 930 1272 C 830 1280 700 1278 600 1272 C 582 1258 582 1216 600 1200 Z"/>
+      <text x="765" y="1248" text-anchor="middle" style="font:italic 600 34px Fraunces,serif" fill="#002A8E">right only 6</text></g>
+  </svg>
+  <div class="grain"></div>
+</section>
+
+<!-- 2: ref 74 calendar page with stickers, cobalt on cream -->
+<section class="post" id="p2">
+  <div class="rings">
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="ui" style="left:70px;top:200px;font:800 56px/1 'Inter Tight',sans-serif;letter-spacing:-.02em">October</div>
+  <div class="ui" style="right:70px;top:204px;font:500 52px/1 'Inter Tight',sans-serif;font-style:italic">2026</div>
+  <div class="cal">
+    <div class="dname">SUNDAY</div><div class="dname">MONDAY</div><div class="dname">TUESDAY</div>
+    <div><span class="dn">25</span></div>
+    <div class="big"><span class="dn" style="color:var(--cr)">26</span>
+      <div class="hand" style="left:40px;top:150px;font-size:128px;color:var(--cr)">S-1<br><span class="it">filed</span></div>
+      <div class="script" style="left:44px;top:404px;font-size:40px;color:var(--cr)">a proposed IPO</div></div>
+    <div><span class="dn">27</span></div>
+    <div><span class="dn" style="opacity:.45">nov 01</span></div><div><span class="dn" style="opacity:.45">02</span></div><div><span class="dn" style="opacity:.45">03</span></div>
+  </div>
+  <div class="sticker" style="left:46px;top:560px;width:250px;height:110px;border-radius:20px;background:#fff;border:4px solid var(--co);rotate:-8deg;font:800 34px/1.05 'Inter Tight',sans-serif">Anthropic</div>
+  <div class="sticker" style="left:736px;top:560px;width:300px;height:150px;border-radius:24px;background:#BFD0FF;border:4px solid var(--co);rotate:6deg;font:700 40px/1.05 Fraunces,serif;font-style:italic">GSA deal<br>Oct 27</div>
+  <div class="sticker" style="left:560px;top:940px;width:330px;height:330px;background:var(--yel);clip-path:polygon(50% 0,61% 13%,77% 5%,80% 22%,97% 25%,90% 41%,100% 54%,86% 64%,90% 82%,72% 83%,62% 98%,50% 87%,38% 98%,28% 83%,10% 82%,14% 64%,0 54%,10% 41%,3% 25%,20% 22%,23% 5%,39% 13%);font:800 30px/1 'Inter Tight',sans-serif;color:var(--co);box-shadow:none;rotate:8deg">ticker<br><span style="font-size:84px">ANT</span></div>
+  <div class="sticker" style="left:70px;top:1110px;width:300px;height:120px;border-radius:999px;background:#fff;border:4px solid var(--co);rotate:-4deg;font:700 38px/1 Fraunces,serif;font-style:italic">price: not set</div>
+</section>
+
+<!-- 3: ref 10 curve with ref 77 hand caps labels, cream line on cobalt -->
+<section class="post" id="p3">
+  <svg class="full" style="top:140px">
+    <defs><filter id="wob"><feTurbulence type="fractalNoise" baseFrequency=".018" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="5"/></filter></defs>
+    <g filter="url(#wob)">
+      <path class="th s" d="M 200 960 L 200 420 M 180 448 L 200 420 L 220 448"/>
+      <path class="th s" d="M 186 944 L 920 944 M 892 924 L 920 944 L 892 964"/>
+      <path class="th s" id="curve" style="stroke-width:8" d=""/>
+      <path class="th s" style="stroke-width:8" d="M 702 508 L 708 850 L 900 340"/>
+      <g fill="none" stroke="#F3EDDC" stroke-width="3" stroke-dasharray="10 9"><circle cx="240" cy="893" r="20"/><circle cx="430" cy="705" r="130"/><circle cx="702" cy="508" r="70"/><circle cx="708" cy="850" r="26"/><circle cx="900" cy="340" r="26"/></g>
+    </g>
+  </svg>
+  <div class="hand" style="left:70px;top:90px;font-size:130px">the AI<br><span class="it">coding</span> curve</div>
+  <div class="ui" style="left:120px;top:520px;font:600 28px/1 'Inter Tight';letter-spacing:.16em">TRUST</div>
+  <div class="ui" style="left:860px;top:1120px;font:600 28px/1 'Inter Tight';letter-spacing:.16em">TIME</div>
+  <div class="ui" style="left:276px;top:1014px;font:600 26px/1 'Inter Tight';letter-spacing:.14em">IT CODES!</div>
+  <div class="ui" style="left:290px;top:670px;font:600 26px/1.15 'Inter Tight';letter-spacing:.14em">WAIT, WHAT<br>DID IT CHANGE</div>
+  <div class="ui" style="left:560px;top:540px;font:600 26px/1 'Inter Tight';letter-spacing:.14em">ACCEPT ALL</div>
+  <div class="ui" style="left:744px;top:940px;font:600 24px/1.15 'Inter Tight';letter-spacing:.14em">IT DELETED<br>MY TESTS</div>
+  <div class="ui" style="left:866px;top:398px;transform:translateX(-100%);text-align:right;font:600 26px/1.15 'Inter Tight';letter-spacing:.14em">I READ<br>EVERY DIFF</div>
+  <div class="script" style="left:0;right:0;top:1236px;text-align:center">where are you on it?</div>
+  <div class="grain"></div>
+</section>
+
+<!-- 4: ref 82 collage, the context window as cut-out scraps; typefaces only (no handwriting fonts) -->
+<section class="post" id="p4">
+  <div class="sc" style="left:150px;top:96px;width:250px;height:330px;background:#fff;font:800 76px/.9 'Bricolage Grotesque',sans-serif;letter-spacing:-.04em;padding:26px 20px">fix my<br>login<br>bug<br>please</div>
+  <div class="sc" style="left:400px;top:236px;width:330px;height:250px;background:#E9EEF9;font:500 25px/1.5 'JetBrains Mono',monospace;padding:18px 16px"><span style="font-weight:700">SYSTEM PROMPT:</span><br><br>1. Be helpful<br>2. Be honest<br>3. Cite sources<br>4. Keep it short</div>
+  <div class="sc" style="left:730px;top:96px;width:210px;height:296px;background:#C9D6F2;font:italic 400 52px/1.02 Fraunces,serif;padding:14px 12px;letter-spacing:-.02em">&ldquo;Here is the fixed code.&rdquo;</div>
+  <div class="sc" style="left:150px;top:426px;width:250px;height:370px;background:#002A8E;color:#F3EDDC;font:700 40px/1.05 'Inter Tight',sans-serif;letter-spacing:-.03em;padding:22px 18px">you: it fails.<br><br>you: same error.<br><br>you: try again.</div>
+  <div class="sc" style="left:400px;top:486px;width:330px;height:200px;background:#fff;font:800 58px/.95 'Bricolage Grotesque',sans-serif;letter-spacing:-.04em;padding:14px 14px">TypeError:<br>user is<br>undefined</div>
+  <div class="sc" style="left:730px;top:392px;width:210px;height:410px;background:#9FB6EA;font:400 44px/1.18 Fraunces,serif;text-align:center;padding:16px 6px">Every message since hello, word for word.</div>
+  <div class="sc" style="left:400px;top:686px;width:330px;height:100px;background:#E9EEF9;font:800 74px/1.3 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;text-align:center">auth.js</div>
+  <div class="sc" style="left:380px;top:792px;font:800 106px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.055em;color:#002A8E;background:none">all of it.</div>
+  <div class="sc" style="left:120px;top:800px;width:268px;height:300px;background:#fff;text-align:center;padding:16px 6px">
+    <div style="font:600 26px/1 'Inter Tight',sans-serif;letter-spacing:.14em">SCROLLED UP?</div>
+    <div style="font:italic 400 64px/1.1 Fraunces,serif">still</div>
+    <div style="font:600 26px/1 'Inter Tight',sans-serif;letter-spacing:.14em">IN THE WINDOW</div>
+    <div style="font:800 64px/1.1 'Bricolage Grotesque',sans-serif;letter-spacing:-.04em;margin-top:8px">tokens</div>
+    <div style="font:500 20px/1.2 'JetBrains Mono',monospace;margin-top:10px">every word counts</div></div>
+  <div class="sc" style="left:388px;top:908px;width:292px;height:290px;background:#C9D6F2;font:800 50px/1.02 'Bricolage Grotesque',sans-serif;letter-spacing:-.04em;padding:16px 18px">when it is<br>full,<br><span style="font:italic 400 54px/1 Fraunces,serif">something</span><br>goes.</div>
+  <div class="sc" style="left:686px;top:904px;width:316px;height:150px;background:#fff;font:italic 400 40px/1.1 Fraunces,serif;padding:12px 16px">&ldquo;Here, read my whole repo.&rdquo;</div>
+  <div class="sc" style="left:688px;top:1062px;font:500 17px/1.3 'JetBrains Mono',monospace;background:none">const user = await getUser(id);</div>
+  <div class="sc" style="left:686px;top:1092px;width:316px;height:210px;background:#fff;font:700 31px/1.36 'Inter Tight',sans-serif;letter-spacing:-.01em;padding:14px 16px">The model has <span class="hl">no memory.</span> It reads only what is in the window.</div>
+  <div class="sc" style="left:70px;top:1110px;width:330px;height:200px;background:#002A8E;color:#F3EDDC;font:800 46px/1.02 'Bricolage Grotesque',sans-serif;letter-spacing:-.035em;text-align:center;padding:30px 14px">this is what the AI <span style="font:italic 400 50px/1 Fraunces,serif">actually</span> reads.</div>
+</section>
+
+<!-- 5: ref 77 labelled hero: a thick-line laptop, labels with short hand arrows. Math: 7B parameters x 2 bytes (16-bit)
+     = 14 GB of weights; at 4-bit (0.5 byte) about 3.5 GB of weights, before the KV cache and runtime overhead. -->
+<section class="post" id="p5">
+  <div class="hand" style="left:70px;top:80px;font-size:150px">will it <span class="it">fit?</span></div>
+  <div class="ui" style="left:74px;top:250px;font:600 26px/1 'Inter Tight',sans-serif;letter-spacing:.14em">A 7B MODEL ON YOUR LAPTOP</div>
+  <svg class="full">
+    <defs><filter id="rough5"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="8"/><feDisplacementMap in="SourceGraphic" scale="5"/></filter></defs>
+    <g filter="url(#rough5)">
+      <path class="th" d="M 300 520 L 780 520 Q 800 520 800 540 L 800 830 L 280 830 L 280 540 Q 280 520 300 520 Z"/>
+      <path class="th" d="M 220 850 L 860 850 L 900 900 Q 905 912 890 912 L 190 912 Q 175 912 180 900 Z"/>
+      <path class="th s" d="M 330 580 L 600 580 M 330 630 L 520 630 M 330 680 L 660 680 M 330 730 L 470 730" style="stroke-width:7;opacity:.8"/>
+      <path class="th s" d="M 640 720 L 740 720 L 740 800 L 640 800 Z M 660 720 L 660 700 M 690 720 L 690 700 M 720 720 L 720 700 M 660 800 L 660 820 M 690 800 L 690 820 M 720 800 L 720 820" style="stroke-width:7"/>
+      <path class="th s" d="M 250 470 C 300 450 360 470 400 520" style="stroke-width:6"/><path class="th s" d="M 388 500 L 402 524 L 376 520" style="stroke-width:6"/>
+      <path class="th s" d="M 860 600 C 840 640 790 690 750 720" style="stroke-width:6"/><path class="th s" d="M 760 698 L 748 724 L 776 722" style="stroke-width:6"/>
+      <path class="th s" d="M 300 1010 C 320 970 380 940 430 920" style="stroke-width:6"/><path class="th s" d="M 404 914 L 432 918 L 416 940" style="stroke-width:6"/>
+      <path d="M 770 470 L 784 498 L 814 502 L 792 522 L 798 552 L 770 538 L 742 552 L 748 522 L 726 502 L 756 498 Z" fill="none" stroke="#F4D23C" stroke-width="6" stroke-linejoin="round"/>
+    </g>
+  </svg>
+  <div class="lab5" style="left:70px;top:360px">the weights<b>7B &times; 2 bytes = 14 GB</b></div>
+  <div class="lab5" style="left:700px;top:530px;text-align:right;width:310px;left:700px">your RAM<b>say, 16 GB</b></div>
+  <div class="lab5" style="left:150px;top:1030px">squeeze to 4-bit<b>about 3.5 GB of weights</b></div>
+  <div class="script" style="left:70px;top:1180px;font-size:42px">so a 7B model fits, if you shrink it.</div>
+  <div class="ui" style="left:70px;top:1264px;font:500 22px/1.3 'JetBrains Mono',monospace;opacity:.75">weights only; the chat itself (KV cache) needs more</div>
+  <div class="grain"></div>
+</section>
+
+<script>
+  (function () {   // the knot of ref 10, seeded
+    let r = 11; const rnd = () => ((r = (r * 9301 + 49297) % 233280) / 233280);
+    const cx = 430, cy = 705, pts = [[240, 893], [352, 728]];
+    for (let t = 0; t < 26; t++) { const a = t * 1.9 + rnd() * .8, R = 45 + rnd() * 62; pts.push([cx + Math.cos(a) * R + (rnd() - .5) * 30, cy + Math.sin(a) * R * .85]); }
+    pts.push([520, 700], [560, 650], [702, 508]);
+    let d = `M ${pts[0]}`;
+    for (let i = 0; i < pts.length - 1; i++) { const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+      d += ` C ${[p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6].map(Math.round)} ${[p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6].map(Math.round)} ${p2}`; }
+    document.getElementById('curve').setAttribute('d', d);
+  })();
+</script>
+</body>
+</html>

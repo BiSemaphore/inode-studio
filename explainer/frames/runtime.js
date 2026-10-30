@@ -123,7 +123,9 @@
         const el = document.createElement('div');
         el.className = 'sub-bubble ' + (onMist ? 'on-mist' : 'on-teal');
         const tx = document.createElement('div'); tx.className = 'sub-text';
-        const spans = ws.map(([w]) => { const s = document.createElement('span'); s.textContent = w + ' '; tx.appendChild(s); return s; });
+        // window.KEYWORDS = {beat: ['word', ...]}: those words get class kw (themes set them in a contrasting style, refs 87-88)
+        const kws = ((window.KEYWORDS || {})[k] || []).map(norm);
+        const spans = ws.map(([w]) => { const s = document.createElement('span'); s.textContent = w + ' '; if (kws.includes(norm(w))) s.className = 'kw'; tx.appendChild(s); return s; });
         el.appendChild(tx);
         document.body.appendChild(el);
         const sub = { el, spans, ws, t0: ws[0][1] - 0.08, t1: ws[ws.length - 1][2] };
@@ -181,7 +183,8 @@
     subs.forEach(({ el, spans, ws, t0, t1, loop, cut, cutIn }) => {
       const t = tf;
       el.style.opacity = (cutIn ? (t >= t0 ? 1 : 0) : clamp((t - t0) / 0.12)) * (cut ? (t < t1 ? 1 : 0) : 1 - clamp((t - t1) / 0.12));
-      spans.forEach((s, i) => { s.style.opacity = i === 0 || t >= ws[i][1] - 0.04 ? 1 : 0; });   // never an empty bubble
+      // spoken words full; the rest of the line waits at window.SUB_NEXT (default 0: hidden; refs 87-88 use about .38)
+      spans.forEach((s, i) => { s.style.opacity = i === 0 || t >= ws[i][1] - 0.04 ? 1 : (window.SUB_NEXT || 0); });   // never an empty bubble
       if (loop) { loop.path.style.strokeDashoffset = loop.L * (1 - ease(clamp((t - loop.at) / 0.45)));
         loop.path.style.visibility = t < loop.at ? 'hidden' : 'visible'; }   // its round end cap would show as a dot
     });
