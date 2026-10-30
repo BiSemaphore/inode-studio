@@ -27,7 +27,7 @@
   "page": "white (default) | green: <body data-page=\"green\"> (green paper surface, tools/make_surface.py)"
  },
  "template": "themes/card/template.html",
- "example": "motion/shorts/embeddings-01-v2",
+ "example": "videos/math-behind-llms/2-embeddings/v2",
  "preview": "brand/references/studies/embeddings-v2-green.png",
  "sound": {
   "taps": [

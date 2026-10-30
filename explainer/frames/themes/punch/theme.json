@@ -22,7 +22,7 @@
  },
  "variants": {},
  "template": "themes/punch/template.html",
- "example": "motion/shorts/prompt-injection-01-v2",
+ "example": "videos/prompt-injection/v2",
  "preview": "brand/references/studies/18-inspired.png",
  "sound": {
   "taps": [

@@ -22,7 +22,7 @@
  },
  "variants": {},
  "template": "themes/notebook/template.html",
- "example": "motion/shorts/tokens-01",
+ "example": "videos/math-behind-llms/1-tokens/v1",
  "preview": "brand/references/studies/field-style.png",
  "sound": {
   "taps": [
