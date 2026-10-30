@@ -188,8 +188,13 @@
       if (loop) { loop.path.style.strokeDashoffset = loop.L * (1 - ease(clamp((t - loop.at) / 0.45)));
         loop.path.style.visibility = t < loop.at ? 'hidden' : 'visible'; }   // its round end cap would show as a dot
     });
-    frames.forEach(({ f, t0, t1, k }) => {
-      f.style.opacity = (k === 0 ? 1 : clamp((t - t0) / 0.3)) * (t < t1 + 0.3 ? 1 : 0);   // frame 0 is up from t = 0
+    // window.HARD_CUTS: no crossfade; only the latest started frame shows, switched on whole output frames (the blur
+    // never mixes two frames). Needed when frames have no opaque card, so two pages' text would ghost (owner 2026-10-30).
+    const ts = window.HARD_CUTS ? Math.ceil(t * 30 - 1e-6) / 30 : t;
+    const cur = window.HARD_CUTS ? frames.filter(({ t0, k }) => k === 0 || ts >= t0 + 0.3).pop() : null;   // cut on the beat start itself
+    frames.forEach((fr) => {
+      const { f, t0, t1, k } = fr;
+      f.style.opacity = cur ? (fr === cur ? 1 : 0) : (k === 0 ? 1 : clamp((t - t0) / 0.3)) * (t < t1 + 0.3 ? 1 : 0);   // frame 0 is up from t = 0
       f.style.zIndex = k;
     });
     els.forEach(({ e, at, out, base }) => {

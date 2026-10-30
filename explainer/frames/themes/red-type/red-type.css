@@ -1,0 +1,59 @@
+/* Theme "red-type" (owner 2026-10-30): no card. Type set straight on our red grain, the system of the red carousel
+   (posts/news-2026-10-30/01): Bricolage Grotesque 800 headlines with one Fraunces italic accent, Inter Tight caps
+   labels, JetBrains Mono numbers, ruled rows. One left edge (96 px), the headline always at y 470, the content block
+   always from y 840, so every frame lines up. body[data-page="green"] is the same layout on our green (LinkedIn).
+   Hard cuts come from fx.js ([data-show] / [data-hide]). */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Fraunces:ital,opsz,wght@1,9..144,400&family=Inter+Tight:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+:root { --ink: #FFFFFF; --bg: #AB3D3C; --acc: #FFE27A; --shadow: 0 3px 14px rgba(60,6,6,.38); }   /* pure white (owner 2026-10-30: no cream tint) */
+html, body { background: var(--bg); }
+body { background: var(--bg) url('../red-grain/surface.png') 0 0 / 1080px 1920px no-repeat; color: var(--ink); }
+body[data-page="green"] { --bg: #0C462C; --acc: #F8EB44; background: #0C462C url('../card/surface-green.png') 0 0 / 1080px 1920px no-repeat; }
+.frame { color: var(--ink); z-index: 2; }
+.stage { text-shadow: var(--shadow); }            /* a soft shadow lifts the white off the grain */
+svg.l { filter: drop-shadow(var(--shadow)); }
+.blk, .chip.f { text-shadow: none; }
+/* blue: the blueprint ground of the hackathon LinkedIn video (themes/blueprint: sky + ruled grid, white only) */
+body[data-page="blue"] { --bg: #0A3A9E; --acc: #FFFFFF; --shadow: 0 3px 14px rgba(2,16,60,.45); background: #0A3A9E; }
+body[data-page="blue"] .sub-text .kw { font-weight: 800; text-decoration: underline 3px; text-underline-offset: 7px; }
+.bp-sky { position: absolute; inset: -260px; filter: blur(110px); z-index: 0;
+  background: radial-gradient(40% 32% at 14% 12%, #021A63 0%, transparent 70%), radial-gradient(46% 36% at 88% 28%, #0B47C2 0%, transparent 70%),
+    radial-gradient(52% 40% at 24% 74%, #062B86 0%, transparent 70%), radial-gradient(42% 32% at 86% 86%, #021A63 0%, transparent 70%),
+    linear-gradient(160deg, #06308F, #0A43B8 50%, #072E8C); }
+svg.bp-grid { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; }
+.bp-grid .g1 { stroke: rgba(255,255,255,.14); stroke-width: 1.2; } .bp-grid .g5 { stroke: rgba(255,255,255,.4); stroke-width: 2; }
+.bp-grid .tick { stroke: rgba(255,255,255,.55); stroke-width: 2; } .bp-grid .num { fill: rgba(255,255,255,.55); font: 500 20px 'Inter Tight', sans-serif; }
+.bp-grid .dash { stroke: rgba(255,255,255,.3); stroke-width: 2; stroke-dasharray: 8 10; fill: none; }
+[data-show] { visibility: hidden; }
+.x { position: absolute; }
+.tag { position: absolute; left: 96px; top: 400px; font: 700 24px/1 'Inter Tight', sans-serif; letter-spacing: .18em; text-transform: uppercase; opacity: .85; }
+.hd { position: absolute; left: 96px; width: 888px; top: 470px; font: 800 112px/.92 'Bricolage Grotesque', sans-serif; letter-spacing: -.045em; }
+.hd i, .acc { font: italic 400 1.04em/1 Fraunces, serif; letter-spacing: -.02em; }
+.blk { display: inline-block; background: var(--ink); color: var(--bg); padding: 0 .12em .03em; border-radius: 8px; rotate: -2deg; }
+.quote { position: absolute; left: 96px; width: 888px; top: 470px; font: italic 400 76px/1.08 Fraunces, serif; letter-spacing: -.02em; }
+.huge { position: absolute; left: 96px; font: 800 230px/.9 'Bricolage Grotesque', sans-serif; letter-spacing: -.06em; white-space: nowrap; }
+.mono { position: absolute; left: 96px; font: 500 40px/1.6 'JetBrains Mono', monospace; white-space: nowrap; }
+.mono b { font-weight: 700; color: var(--acc); }
+.lab { position: absolute; left: 96px; font: 700 24px/1 'Inter Tight', sans-serif; letter-spacing: .16em; text-transform: uppercase; opacity: .85; }
+.row { position: absolute; left: 96px; width: 888px; display: flex; justify-content: space-between; align-items: baseline;
+  border-top: 3px solid var(--ink); padding-top: 22px; }
+.row .k { font: 800 64px/1 'Bricolage Grotesque', sans-serif; letter-spacing: -.035em; }
+.row .v { font: italic 400 44px/1 Fraunces, serif; }
+.chip { position: absolute; padding: 16px 34px 22px; border: 4px solid var(--ink); border-radius: 18px;
+  font: 800 76px/1 'Bricolage Grotesque', sans-serif; letter-spacing: -.035em; }
+.chip.f { background: var(--ink); color: var(--bg); }
+.pct { position: absolute; font: 800 64px/1 'Bricolage Grotesque', sans-serif; letter-spacing: -.03em; }
+svg.l { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; }
+.ln { fill: none; stroke: var(--ink); stroke-linecap: round; stroke-linejoin: round; }
+/* subtitles: plain text, keywords in the accent */
+.sub-bubble { left: 96px; right: 96px; bottom: 330px; text-align: left; }
+.sub-text { font: 600 44px/1.3 'Inter Tight', sans-serif; letter-spacing: -.01em; color: var(--ink); text-shadow: var(--shadow); }
+.sub-text .kw { color: var(--acc); }
+/* LinkedIn 16:9: the same column on the left, subtitles in a column on the right */
+@media (orientation: landscape) {
+  body { background-image: url('../red-grain/surface-wide.png'); background-size: 1920px 1080px; }
+  body[data-page="green"] { background-image: url('../card/surface-green-wide.png'); background-size: 1920px 1080px; }
+  .stage, .stage.s-brand { transform: translate(150px, -225px) scale(.9); }   /* content y 400..1300 centred in 1080 */
+  .sub-bubble { left: 1120px; right: 120px; top: 200px; bottom: auto; }   /* level with the headline */
+  .sub-text { font-size: 46px; }
+}
+body[data-page="blue"] .stage { left: -6px; }   /* left edge on the grid major line at x 90 */

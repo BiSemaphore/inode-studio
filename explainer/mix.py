@@ -166,7 +166,10 @@ def palette_of(piece):
     meta = piece / "meta.json"
     name = found[-1] if found else (json.loads(meta.read_text()).get("theme") if meta.exists() else None)
     tj = pathlib.Path(__file__).resolve().parent / "frames" / "themes" / str(name) / "theme.json"
-    return name, (json.loads(tj.read_text()).get("sound") if tj.exists() else None) or DEFAULT_PALETTE
+    pal = (json.loads(tj.read_text()).get("sound") if tj.exists() else None) or DEFAULT_PALETTE
+    if meta.exists() and json.loads(meta.read_text()).get("sound"):   # a piece can set its own beat track and levels
+        pal = {**pal, **json.loads(meta.read_text())["sound"]}
+    return name, pal
 
 
 def kit_effects(e, sfx, pal):

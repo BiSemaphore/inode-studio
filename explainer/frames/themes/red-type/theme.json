@@ -1,21 +1,24 @@
 {
- "name": "cinema",
- "title": "Cinema",
- "status": "test 2026-10-29 (fast-cut kinetic typography)",
+ "name": "red-type",
+ "title": "Red type",
+ "status": "test 2026-10-30 (attention part 3, no card)",
  "extends": "base",
+ "use_for": "Series explainers as pure typography on the red grain (Instagram) or green (LinkedIn): the red carousel's type system, hard cuts",
  "load": {
   "css": [
    "themes/base/base.css",
-   "themes/cinema/cinema.css"
+   "themes/red-type/red-type.css"
   ],
   "js_before_runtime": [],
   "js_after_runtime": [
+   "kinetic.js",
    "fx.js"
   ]
  },
  "sound": {
   "bed": "none",
-  "music": "fast/beat-fast-cut-test.wav",
+  "music_db": -11,
+  "duck": 0.45,
   "named": {
    "impact": {
     "files": [
@@ -66,8 +69,6 @@
     ],
     "level": 0.2
    }
-  },
-  "music_db": -7,
-  "duck": 0.35
+  }
  }
 }
