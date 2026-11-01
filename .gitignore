@@ -40,3 +40,5 @@ archive/*
 
 # Photos to doodle (personal, never committed): drop in doodle/inbox, results land in doodle/done
 /doodle/
+assets/music/**
+!assets/music/LEDGER.md
