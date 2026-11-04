@@ -7,8 +7,8 @@ allowed (incompetech FAQ). Credit in the caption:
 | file | title | feel | status |
 |---|---|---|---|
 | desert-city.mp3 | Desert City | Middle Eastern | available (only in the unpublished algebra test) |
-| pamgaea.mp3 | Pamgaea | world groove, plucked strings | available |
-| inspired.mp3 | Inspired | calm, modern, hopeful | available |
+| pamgaea.mp3 | Pamgaea | world groove, plucked strings (tech) | next tech video |
+| inspired.mp3 | Inspired | calm, modern, hopeful (tech) | used: how-ai-works 01 agents |
 | easy-lemon.mp3 | Easy Lemon | light, bright | available, for storytelling videos |
 
 Source: https://incompetech.com/music/royalty-free/mp3-royaltyfree/<Title>.mp3 (downloaded 2026-10-31)

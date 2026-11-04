@@ -10,6 +10,7 @@ Checks, in order:
   5. format     1080x1920, 30 fps, length matches index.html within a frame
   6. av-offset  the render's audio IS assets/audio/soundtrack.wav (correlation >= 0.99) with 0 offset (within 1 ms)
   7. loudness   integrated -14 LUFS (+/- 1), sample peak at most -1.0 dBFS
+  8. reference  if BRIEF.md has 'Reference: <image>': tools/ref_check.py on 4 frames (palette + side-by-side sheet)
 Then it reminds what is still manual: the video-reviewer agent and the owner's listen. Exit code 1 on any FAIL.
 """
 import json, re, subprocess, sys
@@ -89,6 +90,22 @@ def main(piece, video=None):
     i = float([l for l in err.splitlines() if l.strip().startswith("I:")][-1].split()[1])
     p = float([l for l in err.splitlines() if l.strip().startswith("Peak:")][-1].split()[1])
     report("loudness", abs(i + 14) <= 1 and p <= -1.0, f"{i} LUFS, peak {p} dBFS")
+
+    brief = piece / "BRIEF.md"
+    m = re.search(r"^Reference:\s*(\S+)", brief.read_text(), re.M) if brief.exists() else None
+    if m:
+        ref = (ROOT / m.group(1)) if not Path(m.group(1)).is_absolute() else Path(m.group(1))
+        sheet = piece / "proof" / "ref-check.jpg"
+        sheet.parent.mkdir(exist_ok=True)
+        dur = float(probe["format"]["duration"])
+        times = ",".join(f"{dur * f:.1f}" for f in (0.05, 0.35, 0.65, 0.9))
+        r = run([str(ROOT / ".venv/bin/python"), str(ROOT / "tools/ref_check.py"), str(ref), str(video),
+                 "--times", times, "--out", str(sheet)])
+        fails = [l for l in r.stdout.splitlines() if l.startswith("FAIL")]
+        report("reference", r.returncode == 0,
+               f"palette vs {ref.name}: {'all frames on palette' if not fails else fails[0][6:]}; side by side: {sheet.relative_to(ROOT)}")
+    else:
+        print("note      no 'Reference:' line in BRIEF.md, reference check skipped")
 
     passed = all(results)
     print(f"\n{'PASSED' if passed else 'FAILED'}: {sum(results)}/{len(results)} checks on {video.relative_to(ROOT)}")

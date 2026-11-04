@@ -6,6 +6,9 @@ Reads <piece>/voice/timings.json and replaces the block between `/* VOICE-TIMES 
 <piece>/compositions/film.html with `const VT = {...}` and a helper `W(beat, word, n = 1)` (the start of the n-th
 time `word` is spoken in that beat; punctuation and case ignored). `VT[beat].start` / `.end` are the beat's bounds.
 Also sets the film length (last word + tail) on every `data-duration` in index.html and on the film's root clip.
+Subtitles: if film.html has `<!-- CAPTIONS --><!-- END CAPTIONS -->` (markup) and `/* CAPTION-TIMES */
+/* END CAPTION-TIMES */` (script), they are filled with one short line at a time (at most --cap-chars characters,
+breaking at punctuation first), each shown from its first spoken word to the next line, from voice/timings.json.
 Run it after every voice change, then rebuild the sound (tools/sound_mix.py) and render.
 """
 import json, re, sys
@@ -16,7 +19,7 @@ def norm(w):
     return re.sub(r'[.,:;!?"“”]+$', "", w.lower())
 
 
-def main(piece, tail=2.3):
+def main(piece, tail=2.3, cap_chars=30):
     piece = Path(piece)
     tm = json.loads((piece / "voice" / "timings.json").read_text())
     beats = json.loads((piece / "beats.json").read_text())["beats"]
@@ -39,7 +42,40 @@ def main(piece, tail=2.3):
     s, k = re.subn(r"/\* VOICE-TIMES.*?/\* END VOICE-TIMES \*/", lambda m: block, s, flags=re.S)
     if k != 1:
         sys.exit("film.html needs one /* VOICE-TIMES */ ... /* END VOICE-TIMES */ block")
-    s = re.sub(r'(id="desk" class="[^"]*" data-start="0" data-duration=")[\d.]+', rf"\g<1>{length}", s)
+    s = re.sub(r'(id="(?:desk|stage)" class="[^"]*" data-start="0" data-duration=")[\d.]+', rf"\g<1>{length}", s)
+    if "<!-- CAPTIONS -->" in s:
+        caps = []
+        for b, t in zip(beats, tm):
+            words, chunks, cur = t["words"], [], []
+            for w in words:
+                if cur and len(" ".join(x[0] for x in cur + [w])) > cap_chars:
+                    cut = max((i for i, x in enumerate(cur[:-1]) if x[0][-1] in ",.:;?!"), default=None)
+                    if cut is not None and cut >= 1:
+                        chunks.append(cur[:cut + 1]); cur = cur[cut + 1:]
+                    else:
+                        chunks.append(cur); cur = []
+                cur.append(w)
+                if w[0][-1] in ".?!":
+                    chunks.append(cur); cur = []
+            if cur:
+                chunks.append(cur)
+            merged = []
+            for c in chunks:                      # no orphan line of one or two short words
+                txt = " ".join(x[0] for x in c)
+                if merged and len(txt) <= 11 and len(" ".join(x[0] for x in merged[-1] + c)) <= cap_chars + 12:
+                    merged[-1] = merged[-1] + c
+                else:
+                    merged.append(c)
+            for c in merged:
+                caps.append([" ".join(x[0] for x in c), c[0][1], c[-1][2]])
+        timed = []
+        for k, (txt, a, e) in enumerate(caps):
+            nxt = caps[k + 1][1] if k + 1 < len(caps) else e + 0.6
+            timed.append([f"cap{k}", round(a - 0.05, 3), round(min(nxt, e + 0.9) - 0.03, 3)])
+        html = "\n".join(f'      <div id="cap{k}" class="cap">{txt}</div>' for k, (txt, _, _) in enumerate(caps))
+        s = re.sub(r"<!-- CAPTIONS -->.*?<!-- END CAPTIONS -->", lambda m: "<!-- CAPTIONS -->\n" + html + "\n      <!-- END CAPTIONS -->", s, flags=re.S)
+        s = re.sub(r"/\* CAPTION-TIMES \*/.*?/\* END CAPTION-TIMES \*/", lambda m: "/* CAPTION-TIMES */\n    const CAPS = " + json.dumps(timed) + ";\n    /* END CAPTION-TIMES */", s, flags=re.S)
+        print(f"{len(caps)} subtitle lines")
     film.write_text(s)
     idx = piece / "index.html"
     i = re.sub(r'(data-duration=")[\d.]+(")', rf"\g<1>{length}\2", idx.read_text())
