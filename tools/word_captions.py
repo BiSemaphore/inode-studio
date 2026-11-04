@@ -43,8 +43,9 @@ def groups_for(words, chars):
             line.append(w)
         if line:
             lines.append(line)
-        if len(lines) >= 2 and len(" ".join(x[0] for x in lines[-1])) <= 8:   # no orphan of one short word
-            last = lines.pop(); lines[-1] += last
+        while len(lines) >= 2 and len(" ".join(x[0] for x in lines[-1])) < len(" ".join(x[0] for x in lines[-2])) / 2 \
+                and len(lines[-2]) > 1:                     # no orphan: move words down until the two lines balance
+            lines[-1].insert(0, lines[-2].pop())
         for k in range(0, len(lines), 2):
             out.append(lines[k:k + 2])
     return out
