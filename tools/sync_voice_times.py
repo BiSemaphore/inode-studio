@@ -59,6 +59,9 @@ def main(piece, tail=2.3, cap_chars=30):
                     chunks.append(cur); cur = []
             if cur:
                 chunks.append(cur)
+            for i in range(len(chunks) - 1):      # never end a line on an open quote ("I | don't know")
+                while len(chunks[i]) > 1 and chunks[i][-1][0].startswith('"') and not chunks[i][-1][0].rstrip(",.:;?!").endswith('"'):
+                    chunks[i + 1].insert(0, chunks[i].pop())
             merged = []
             for c in chunks:                      # no orphan line of one or two short words
                 txt = " ".join(x[0] for x in c)
@@ -68,10 +71,11 @@ def main(piece, tail=2.3, cap_chars=30):
                     merged.append(c)
             for c in merged:
                 caps.append([" ".join(x[0] for x in c), c[0][1], c[-1][2]])
-        timed = []
+        timed = []                                # one subtitle at a time: each ends exactly when the next starts
+        starts = [round(a - 0.05, 3) for _, a, _ in caps]
         for k, (txt, a, e) in enumerate(caps):
-            nxt = caps[k + 1][1] if k + 1 < len(caps) else e + 0.6
-            timed.append([f"cap{k}", round(a - 0.05, 3), round(min(nxt, e + 0.9) - 0.03, 3)])
+            nxt = starts[k + 1] if k + 1 < len(caps) else e + 0.6
+            timed.append([f"cap{k}", starts[k], round(min(nxt, e + 0.9), 3)])
         html = "\n".join(f'      <div id="cap{k}" class="cap">{txt}</div>' for k, (txt, _, _) in enumerate(caps))
         s = re.sub(r"<!-- CAPTIONS -->.*?<!-- END CAPTIONS -->", lambda m: "<!-- CAPTIONS -->\n" + html + "\n      <!-- END CAPTIONS -->", s, flags=re.S)
         s = re.sub(r"/\* CAPTION-TIMES \*/.*?/\* END CAPTION-TIMES \*/", lambda m: "/* CAPTION-TIMES */\n    const CAPS = " + json.dumps(timed) + ";\n    /* END CAPTION-TIMES */", s, flags=re.S)
