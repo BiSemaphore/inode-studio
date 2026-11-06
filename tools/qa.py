@@ -7,7 +7,7 @@ Checks, in order:
   2. compose    `npx hyperframes check` passes
   3. sync       sound/sync.json from tools/sound_mix.py: every cue starts with its move and hits within a frame
   4. frames     tools/check_video.py: 0 broken frames
-  5. format     1080x1920, 30 fps, length matches index.html within a frame
+  5. format     1080x1920, 30 fps (or 60 fps when blur is off: smooth without blur artifacts), length matches index.html within a frame
   6. av-offset  the render's audio IS assets/audio/soundtrack.wav (correlation >= 0.99) with 0 offset (within 1 ms)
   7. loudness   integrated -14 LUFS (+/- 1), sample peak at most -1.0 dBFS
   8. reference  if BRIEF.md has 'Reference: <image>': tools/ref_check.py on 4 frames (palette + side-by-side sheet)
@@ -70,7 +70,7 @@ def main(piece, video=None):
                             "stream=width,height,r_frame_rate:format=duration", "-of", "json", str(video)]).stdout)
     st, dur = probe["streams"][0], float(probe["format"]["duration"])
     want = float(re.search(r'data-composition-id="main"[^>]*?data-duration="([\d.]+)"', (piece / "index.html").read_text()).group(1))
-    fmt_ok = st["width"] == 1080 and st["height"] == 1920 and st["r_frame_rate"] == "30/1" and abs(dur - want) <= 1 / 30 + 0.01
+    fmt_ok = st["width"] == 1080 and st["height"] == 1920 and st["r_frame_rate"] in ("30/1", "60/1") and abs(dur - want) <= 1 / 30 + 0.01
     report("format", fmt_ok, f"{st['width']}x{st['height']} {st['r_frame_rate']} fps, {dur:.2f} s (film {want} s)")
 
     st_wav = piece / "assets" / "audio" / "soundtrack.wav"

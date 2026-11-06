@@ -22,6 +22,9 @@ def norm(w):
     return re.sub(r"[^a-z0-9%-]", "", w.lower())
 
 
+WEAK = {"a", "an", "the", "of", "to", "through", "and", "or", "for", "in", "on", "with", "is", "it", "its"}
+
+
 def groups_for(words, chars):
     """Split one beat's words into groups of up to two lines, breaking at sentence ends first."""
     sentences, cur = [], []
@@ -46,6 +49,11 @@ def groups_for(words, chars):
         while len(lines) >= 2 and len(" ".join(x[0] for x in lines[-1])) < len(" ".join(x[0] for x in lines[-2])) / 2 \
                 and len(lines[-2]) > 1:                     # no orphan: move words down until the two lines balance
             lines[-1].insert(0, lines[-2].pop())
+        # never end a line on a small joining word or a bare number: it belongs with what follows
+        # ("7 / billion", "through a / narrow pipe"); move it to the start of the next line
+        for i in range(len(lines) - 1):
+            while len(lines[i]) > 1 and (norm(lines[i][-1][0]) in WEAK or re.fullmatch(r"[0-9.,]+", lines[i][-1][0])):
+                lines[i + 1].insert(0, lines[i].pop())
         for k in range(0, len(lines), 2):
             out.append(lines[k:k + 2])
     return out
