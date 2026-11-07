@@ -22,15 +22,18 @@ def norm(w):
     return re.sub(r"[^a-z0-9%-]", "", w.lower())
 
 
+QWORDS = {"how", "why", "what", "when", "where", "which", "who"}
 WEAK = {"a", "an", "the", "of", "to", "through", "and", "or", "for", "in", "on", "with", "is", "it", "its"}
 
 
 def groups_for(words, chars):
     """Split one beat's words into groups of up to two lines, breaking at sentence ends first."""
     sentences, cur = [], []
-    for w in words:
+    for k, w in enumerate(words):
         cur.append(w)
-        if re.search(r'[.?!]["”]?$', w[0]):
+        nxt = norm(words[k + 1][0]) if k + 1 < len(words) else ""
+        # a sentence end, or a comma right before a question word ("before it, / how does AI ...")
+        if re.search(r'[.?!]["”]?$', w[0]) or (w[0].endswith(",") and nxt in QWORDS):
             sentences.append(cur); cur = []
     if cur:
         sentences.append(cur)
